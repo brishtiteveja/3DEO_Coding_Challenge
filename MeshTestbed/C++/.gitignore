@@ -1,2 +1,12 @@
 Debug/
+ipch/
+.vs/
+
+MeshTestbed.VC.db
 MeshTestbed.VC.VC.opendb
+
+*.suo
+*.user
+*.ncb
+*.sbr
+*.*log
