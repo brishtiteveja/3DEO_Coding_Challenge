@@ -20,6 +20,8 @@ protected:
 	CVertex m_vert[3];
 	CVertex m_Normal;
 	double m_Area;
+	double m_Slope;
+	int m_Color;
 public:
 	CTriangle(void);
 	CTriangle(const CTriangle &rhs);

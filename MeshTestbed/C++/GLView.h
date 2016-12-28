@@ -11,7 +11,7 @@
 // CGLView view
 
 enum PreDefinedView {IsometricView, TopView, BottomView, FrontView, BackView, LeftView, RightView, FreeView};
-enum ViewMethod {Shaded, Wireframe, WireframeNoFlat, Points, WireframeShaded, Extent, Curvature};
+enum ViewMethod {Shaded, Wireframe, WireframeNoFlat, Points, WireframeShaded, Extent, Curvature, ColorSTL};
 enum MouseMode {Rotate, Pan, ZoomWindow, Rot_Zoom_Pan, Idle};
 // Rot_Zoom_Pan: left button - rotate, mid wheel - zoom, right button - pan
 
@@ -139,6 +139,8 @@ public:
 	afx_msg void OnViewRight();
 	afx_msg void OnViewExtent();
 	afx_msg void OnUpdateViewExtent(CCmdUI *pCmdUI);
+	afx_msg void OnViewColorSTL();
+	afx_msg void OnUpdateViewColorSTL(CCmdUI *pCmdUI);
 	afx_msg void OnViewWireframeshaded();
 	afx_msg void OnUpdateViewWireframeshaded(CCmdUI *pCmdUI);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);

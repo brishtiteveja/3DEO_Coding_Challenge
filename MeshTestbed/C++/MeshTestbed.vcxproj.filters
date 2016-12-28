@@ -2,15 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{eca9d307-8760-40be-bc8e-82272e177f65}</UniqueIdentifier>
+      <UniqueIdentifier>{c6dc5232-61ea-4062-afbc-56a0a3275c51}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{f6d781cb-6a04-4f1c-8cb7-5d6b2de72d90}</UniqueIdentifier>
+      <UniqueIdentifier>{35766d12-f6d5-40bd-88f8-33d473adc0fd}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl</Extensions>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{b8f9799b-8081-4611-a205-7975d2de3695}</UniqueIdentifier>
+      <UniqueIdentifier>{4ad203e3-0b8b-4336-8d44-23f6a2575adb}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
   </ItemGroup>
@@ -105,21 +105,25 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\MeshTestbed.ico">
+    <Image Include="res\MeshTestbed.ico">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\MeshTestbed.rc2">
+    </Image>
+    <Image Include="res\MeshTestbedDoc.ico">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\MeshTestbedDoc.ico">
+    </Image>
+    <Image Include="res\Toolbar.bmp">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\Toolbar.bmp">
+    </Image>
+    <Image Include="res\toolbar1.bmp">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\toolbar1.bmp">
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="res\MeshTestbed.rc2">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="ReadMe.txt" />
+    </CustomBuild>
   </ItemGroup>
 </Project>

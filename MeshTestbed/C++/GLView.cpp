@@ -158,6 +158,8 @@ BEGIN_MESSAGE_MAP(CGLView, CView)
 	ON_UPDATE_COMMAND_UI(ID_CAMERA_ROTATE, OnUpdateCameraRotate)
 	ON_COMMAND(ID_VIEW_EXTENT, OnViewExtent)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_EXTENT, OnUpdateViewExtent)
+	ON_COMMAND(ID_VIEW_COLORSTL, OnViewColorSTL)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_COLORSTL, OnUpdateViewColorSTL)
 	ON_COMMAND(ID_VIEW_WIREFRAMESHADED, OnViewWireframeshaded)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_WIREFRAMESHADED, OnUpdateViewWireframeshaded)
 	ON_WM_LBUTTONDOWN()
@@ -1071,6 +1073,19 @@ void CGLView::OnUpdateViewExtent(CCmdUI *pCmdUI)
         pCmdUI->SetCheck(FALSE);
 }
 
+void CGLView::OnViewColorSTL()
+{
+	m_ViewMethod = ColorSTL;
+	Invalidate();
+}
+
+void CGLView::OnUpdateViewColorSTL(CCmdUI *pCmdUI)
+{
+	if (m_ViewMethod == ColorSTL)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
 
 // Different view positions
 void CGLView::OnCameraRotate()
