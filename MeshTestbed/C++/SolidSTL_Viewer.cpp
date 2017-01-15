@@ -20,7 +20,11 @@
 #define new DEBUG_NEW
 #endif
 
-float SolidSTL_Viewer::m_PartColor[4] = {0.5f, 1.0f, 1.0f, 1.0f };
+float SolidSTL_Viewer::m_PartColor[4] = {0.0f, 1.0f, 1.0f, 1.0f };
+float SolidSTL_Viewer::m_PartColorRed[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+float SolidSTL_Viewer::m_PartColorGreen[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
+float SolidSTL_Viewer::m_PartColorBlue[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
+
 float SolidSTL_Viewer::m_AmbientLight[4] = { 0.35f, 0.35f, 0.35f, 1.0f };
 float SolidSTL_Viewer::m_DiffuseLight[4] = { 0.35f, 0.35f, 0.35f, 1.0f };
 
@@ -96,7 +100,7 @@ void SolidSTL_Viewer::DrawModel_WireFrameNoFlat( SolidSTL *psolid )
 	glDisable(GL_LIGHT0);
 	glPolygonMode (GL_FRONT, GL_LINE) ; 
 	glPolygonMode (GL_BACK, GL_LINE) ; 
-	glColor4fv(m_PartColor);
+	//glColor4fv(m_PartColor);
 	glLineWidth(1.0f);
 
 	for(int i=0; i<psolid->HalfEdgeNum(); i++)
@@ -110,6 +114,25 @@ void SolidSTL_Viewer::DrawModel_WireFrameNoFlat( SolidSTL *psolid )
 		CVertex v2 = psolid->Vert(iv2).Position();
 
 		glBegin(GL_LINES);
+		int n = rand() % 4 + 0;
+		switch (n) {
+		case 0:
+			glColor4fv(m_PartColor);
+			break;
+		case 1:
+			glColor4fv(m_PartColorRed);
+			break;
+		case 2:
+			glColor4fv(m_PartColorGreen);
+			break;
+		case 3:
+			glColor4fv(m_PartColorBlue);
+			break;
+		default:
+			glColor4fv(m_PartColor);
+			break;
+		}
+
 			glVertex3f((float)v1[AXIS_X], (float)v1[AXIS_Y], (float)v1[AXIS_Z]);
 			glVertex3f((float)v2[AXIS_X], (float)v2[AXIS_Y], (float)v2[AXIS_Z]);
 		glEnd();			
@@ -145,13 +168,32 @@ void SolidSTL_Viewer::DrawModel_Points( SolidSTL *psolid, int ViewSkipVert)
 	glDisable(GL_LIGHT0);
 	glPolygonMode (GL_FRONT, GL_LINE) ; 
 	glPolygonMode (GL_BACK, GL_LINE) ; 
-	glColor4fv(m_PartColor);
 
 	glPointSize(3.0f);
 
 	for(int ctr=0; ctr<psolid->mVert_Num; ctr=ctr + ViewSkipVert)
 	{
 		CVertex v1 = psolid->mVertArray[ctr].Position();
+
+		int n = rand() % 4 + 0;
+		switch (n) {
+		case 0:
+			glColor4fv(m_PartColor);
+			break;
+		case 1:
+			glColor4fv(m_PartColorRed);
+			break;
+		case 2:
+			glColor4fv(m_PartColorGreen);
+			break;
+		case 3:
+			glColor4fv(m_PartColorBlue);
+			break;
+		default:
+			glColor4fv(m_PartColor);
+			break;
+		}
+
 
 		glBegin(GL_POINTS);
 			glVertex3f((float)v1[AXIS_X], (float)v1[AXIS_Y], (float)v1[AXIS_Z]);
@@ -187,9 +229,27 @@ void SolidSTL_Viewer::DrawModel_WireFrameShaded( SolidSTL *psolid, float m_Light
 	IModelMatrix.GetTransformedHVertex(m_LightPos, LocalLight0);
 	glLightfv(GL_LIGHT0, GL_POSITION, LocalLight0);
 
-	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColor);
+//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColor);
 	for (int i=psolid->m_startDpyList; i <= psolid->m_endDpyList; i++)
 	{
+		int n = rand() % 4 + 0;
+		switch (n) {
+		case 0:
+			glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColor);
+			break;
+		case 1:
+			glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColorRed);
+			break;
+		case 2:
+			glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColorGreen);
+			break;
+		case 3:
+			glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColorBlue);
+			break;
+		default:
+			glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColor);
+			break;
+		}
 		glCallList(i);
 	}
 
@@ -208,6 +268,55 @@ void SolidSTL_Viewer::DrawModel_WireFrameShaded( SolidSTL *psolid, float m_Light
 
 	glPopMatrix(); // restore the current view matrix
 }
+void SolidSTL_Viewer::DrawModel_ColorSTL(SolidSTL *psolid, float m_LightPos[4])
+{
+	if (psolid == NULL) return;
+
+	// first combine the transformation of SolidSTL
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix(); // store the current view matrix
+	SetModelTransform(psolid);
+
+	glEnable(GL_CULL_FACE);
+	// Set the light model
+	glLightfv(GL_LIGHT0, GL_AMBIENT, m_AmbientLight);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, m_DiffuseLight);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glPolygonMode(GL_FRONT, GL_FILL);
+	glPolygonMode(GL_BACK, GL_FILL);
+
+	// display shade triangles
+	GLfloat LocalLight0[4];
+	CTransMatrix IModelMatrix;
+	if (psolid->m_MatrixList.IsEmpty() == FALSE)
+		IModelMatrix = psolid->m_MatrixList.GetTail();
+	IModelMatrix.Inverse();
+	IModelMatrix.GetTransformedHVertex(m_LightPos, LocalLight0);
+	glLightfv(GL_LIGHT0, GL_POSITION, LocalLight0);
+
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColorRed);
+	for (int i = psolid->m_startDpyList; i <= psolid->m_endDpyList; i++)
+	{
+		glCallList(i);
+	}
+
+	//// display wireframe
+	//glDisable(GL_LIGHTING);
+	//glDisable(GL_LIGHT0);
+	//glPolygonMode(GL_FRONT, GL_LINE);
+	//glPolygonMode(GL_BACK, GL_LINE);
+	//glLineWidth(2.0f);
+	//glColor4fv(m_PartColor);
+	//for (int i = psolid->m_startDpyList; i <= psolid->m_endDpyList; i++)
+	//{
+	//	glCallList(i);
+	//}
+	//glLineWidth(1.0f);
+
+	glPopMatrix(); // restore the current view matrix
+}
+
 
 void SolidSTL_Viewer::DrawModel_Shaded( SolidSTL *psolid, float m_LightPos[4] )
 {

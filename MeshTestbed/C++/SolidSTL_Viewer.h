@@ -19,6 +19,7 @@ public:
 	void DrawModel_Points( SolidSTL *psolid, int ViewSkipVert );
 	void DrawModel_Shaded( SolidSTL *psolid, float m_LightPos[4] );
 	void DrawModel_Extent( SolidSTL *psolid );
+	void DrawModel_ColorSTL(SolidSTL *psolid, float m_LightPos[4]);
 	void DrawModel_WireFrameShaded( SolidSTL *psolid, float m_LightPos[4] );
 	void DrawModel_Curvature( SolidSTL *psolid, float m_LightPos[4] );	
 
@@ -33,6 +34,9 @@ protected:
 public:
 	// Display attribute
 	static float m_PartColor[4];
+	static float m_PartColorRed[4];
+	static float m_PartColorGreen[4];
+	static float m_PartColorBlue[4];
 	static float m_AmbientLight[4];
 	static float m_DiffuseLight[4];
 };

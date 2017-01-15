@@ -165,6 +165,9 @@ void CMeshTestbedView::DrawScene(void)
 			case Extent:
 				m_stlViewer->DrawModel_Extent( pdoc->mPart[i] );
 				break;
+			case ColorSTL:
+				m_stlViewer->DrawModel_ColorSTL(pdoc->mPart[i], m_LightPos);
+				break;
 			default:
 				// do nothing
 				break;

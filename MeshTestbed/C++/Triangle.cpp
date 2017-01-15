@@ -35,6 +35,7 @@ CTriangle::CTriangle(const CTriangle &rhs)
 	m_vert[2] = rhs.m_vert[2];
 	m_Normal = rhs.m_Normal;
 	m_Area = rhs.m_Area;
+	m_Slope = rhs.m_Slope;
 }
 
 CTriangle::CTriangle(const CVertex &p0, const CVertex &p1, const CVertex &p2)
@@ -44,6 +45,7 @@ CTriangle::CTriangle(const CVertex &p0, const CVertex &p1, const CVertex &p2)
 	m_vert[2] = p2;
 	ComputeNormal();
 	CalcArea();
+	CalcSlope();
 }      
 
 CTriangle::CTriangle(const float x0, const float y0, const float z0,
@@ -55,6 +57,7 @@ CTriangle::CTriangle(const float x0, const float y0, const float z0,
 	m_vert[2][0] = x2;	m_vert[2][1] = y2;	m_vert[2][2] = z2;
 	ComputeNormal();
 	CalcArea();
+	CalcSlope();
 }
 	
 CTriangle::CTriangle(const double x0, const double y0, const double z0,
@@ -66,6 +69,7 @@ CTriangle::CTriangle(const double x0, const double y0, const double z0,
 	m_vert[2][0] = x2;	m_vert[2][1] = y2;	m_vert[2][2] = z2;
 	ComputeNormal();
 	CalcArea();
+	CalcSlope();
 }
 
 CTriangle& CTriangle::operator =(const CTriangle &rhs)
@@ -210,6 +214,25 @@ double CTriangle::CalcArea()
 	//	m_Area = ms;
 	//}
 	return m_Area;
+}
+
+double CTriangle::CalcSlope()
+{
+	// Getting reference surface normal vector
+	CVertex m_Ref_Surface_Norm = CVertex(0.0, 0.0, 1.0);
+	// Get angle between m_Norm and m_Ref_Surface_Norm
+	double m_Norm_Dot_m_Ref = m_Normal.dot(m_Ref_Surface_Norm);
+	double angle = acos(m_Norm_Dot_m_Ref);
+
+	if (abs(angle - M_PI / 2.0) < 1e-06) {
+		printf("slope = %lf\n", INFINITY);
+		return INFINITY;
+	}
+	else {
+		double slope = tan(angle);
+		printf("slope = %lf\n", slope);
+		return slope;
+	}
 }
     
 CTriangle CTriangle::GetReverseTri()

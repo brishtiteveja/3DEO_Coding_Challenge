@@ -56,6 +56,7 @@
 #define ID_FILE_GENERATEBEZIER          32798
 #define ID_FILE_GENERATEBEZIERSURF      32799
 #define ID_VIEW_COLORSTL                32800
+#define ID_VIEW_SH                      32804
 
 // Next default values for new objects
 // 
@@ -63,7 +64,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
 #define _APS_NEXT_RESOURCE_VALUE        137
-#define _APS_NEXT_COMMAND_VALUE         32804
+#define _APS_NEXT_COMMAND_VALUE         32805
 #define _APS_NEXT_CONTROL_VALUE         1017
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

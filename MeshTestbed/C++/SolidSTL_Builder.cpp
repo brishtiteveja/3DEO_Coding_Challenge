@@ -709,6 +709,7 @@ int SolidSTL_Builder::Read_STL_File(CString &STLFileName, CTriangle *&pArray_Tri
 		///curT.SetNormal(normal);
 		curT.ComputeNormal();
 		curT.CalcArea();
+		curT.CalcSlope();
 		curT.SetTag(attrib);
 		pArray_Tri[i]=curT;
 	}

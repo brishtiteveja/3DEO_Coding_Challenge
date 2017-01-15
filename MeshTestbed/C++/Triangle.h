@@ -47,6 +47,8 @@ public:
 	double Area() {		return m_Area;	}
 	double CalcArea();
 
+	double CalcSlope();
+
 	CTriangle GetReverseTri(); // same postion with reverse normal
 	int ReadTriangle(CSolidSTL *pStl, int iIndex);
 
