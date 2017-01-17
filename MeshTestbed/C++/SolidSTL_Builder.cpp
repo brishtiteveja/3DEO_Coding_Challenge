@@ -629,7 +629,19 @@ bool SolidSTL_Builder::Build_CTL(CTriangle *&pArray_Tri,
 	{
 		CTriangle curT = pArray_Tri[i];
 		pTriIDArray[i].SetNormal(curT.Normal());
+		/*
+		char str[256];
+		CVertex Norm = curT.Normal();
+		sprintf_s(str, "Norm (x, y, z): (%lf, %lf, %lf)\n", Norm.getVec()[0], Norm.getVec()[1], Norm.getVec()[2]);
+		OutputDebugString(str);
+		CVertex Centroid = curT.Centroid();
+		sprintf_s(str, "Centroid (x, y, z): (%lf, %lf, %lf)\n", Centroid.getVec()[0], Centroid.getVec()[1], Centroid.getVec()[2]);
+		OutputDebugString(str);
+		*/
+
+		pTriIDArray[i].SetCentroid(curT.Centroid());
 		pTriIDArray[i].SetArea(curT.Area());
+		pTriIDArray[i].SetSlope(curT.Slope());
 		pTriIDArray[i].SetTag(curT.tag());
 	}
 	int curVert_Num = -1;
@@ -708,9 +720,11 @@ int SolidSTL_Builder::Read_STL_File(CString &STLFileName, CTriangle *&pArray_Tri
 		CTriangle curT(v1, v2, v3);
 		///curT.SetNormal(normal);
 		curT.ComputeNormal();
+		curT.ComputeCentroid();
 		curT.CalcArea();
 		curT.CalcSlope();
 		curT.SetTag(attrib);
+
 		pArray_Tri[i]=curT;
 	}
 

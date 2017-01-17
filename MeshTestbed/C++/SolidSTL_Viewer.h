@@ -37,7 +37,9 @@ public:
 	static float m_PartColorRed[4];
 	static float m_PartColorGreen[4];
 	static float m_PartColorBlue[4];
+	static float m_RegionColor[3][4];
 	static float m_AmbientLight[4];
 	static float m_DiffuseLight[4];
+	int SLICE_THICKNESS_PARAM;
 };
 

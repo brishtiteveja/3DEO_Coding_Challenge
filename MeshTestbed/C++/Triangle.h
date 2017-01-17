@@ -19,9 +19,11 @@ protected:
 	int mTag;
 	CVertex m_vert[3];
 	CVertex m_Normal;
+	CVertex m_Centroid;
 	double m_Area;
 	double m_Slope;
-	int m_Color;
+	int m_ColorID;
+	int m_SliceID;
 public:
 	CTriangle(void);
 	CTriangle(const CTriangle &rhs);
@@ -39,12 +41,22 @@ public:
 	void SetTag(int atag) {	mTag = atag;	}
 	int tag() {	return mTag;	}
 
-	void SetNormal(CVertex &aN);
 	CVertex &Normal() {		return m_Normal;	}
+	CVertex	&Centroid() {	return m_Centroid;	}
+	int ColorID() { return m_ColorID;  }
+	int SliceID() { return m_SliceID;  }
+
+	void SetNormal(CVertex &aN) { m_Normal = aN; }
+	void SetCentroid(CVertex &aN) { m_Centroid = aN; }
+	void SetSliceID(int sID) { m_SliceID = sID;  }
+	void SetColorID(int cID) { m_ColorID = cID;  }
+
 	CVertex ComputeNormal();
+	CVertex ComputeCentroid();
 
 	void SetArea(double aA)	{ m_Area = aA;	}
 	double Area() {		return m_Area;	}
+	double Slope() {	return m_Slope;	}
 	double CalcArea();
 
 	double CalcSlope();
@@ -64,11 +76,14 @@ class CTriangleID
 protected:
 	int m_vert[3];
 	CVertex m_Normal;
+	CVertex m_Centroid;
+	int m_SliceID;
+	int m_ColorID;
 	double m_Area;
+	double m_Slope;
 	int m_ShellNum;
 
 	int mTag;
-	int mColorID;
 public:
 	CTriangleID(void);
 	CTriangleID(const CTriangleID &rhs);
@@ -77,17 +92,22 @@ public:
 	CTriangleID & operator =(const CTriangleID &rhs);
 	
 	int operator [](int i);
-	CVertex Normal() {	return m_Normal; }
+	CVertex &Normal() {	return m_Normal; }
+	CVertex &Centroid() {	return m_Centroid; }
+	int SliceID() { return m_SliceID;  }
+	int ColorID() { return m_ColorID;  }
 	double Area() {	return m_Area; }
 	int Shell() {	return m_ShellNum; }
 
 	void SetVertex(int Index, int aValue)	{	m_vert[Index] = aValue;	}
-	void SetNormal(CVertex &aN);
+	void SetNormal(CVertex &aN) { m_Normal = aN;  };
+	void SetCentroid(CVertex &aN) { m_Centroid = aN;  };
+	void SetSliceID(int sID) { m_SliceID = sID;  }
+	void SetColorID(int cID) {	m_ColorID = cID;	}
 	void SetArea(double aA)	{ m_Area = aA;	}
+	void SetSlope(double aS)	{ m_Slope = aS;	}
 	void SetShellNum(int aShell)	{ m_ShellNum = aShell;	}
 	void SetTag(int atag) {	mTag = atag;	}
-	void SetColorID(int aID) {	mColorID = aID;	}
 
 	int tag() {	return mTag;	}
-	int colorID() {	return mColorID;	}
 };

@@ -34,8 +34,11 @@ CTriangle::CTriangle(const CTriangle &rhs)
 	m_vert[1] = rhs.m_vert[1];
 	m_vert[2] = rhs.m_vert[2];
 	m_Normal = rhs.m_Normal;
+	m_Centroid = rhs.m_Centroid;
 	m_Area = rhs.m_Area;
 	m_Slope = rhs.m_Slope;
+	m_ColorID = rhs.m_ColorID;
+	m_SliceID = rhs.m_SliceID;
 }
 
 CTriangle::CTriangle(const CVertex &p0, const CVertex &p1, const CVertex &p2)
@@ -85,7 +88,11 @@ CTriangle& CTriangle::operator =(const CTriangle &rhs)
 	m_vert[2][1] = rhs.m_vert[2][1];
 	m_vert[2][2] = rhs.m_vert[2][2];
 	m_Normal = rhs.m_Normal;
+	m_Centroid = rhs.m_Centroid;
 	m_Area = rhs.m_Area;
+	m_Slope = rhs.m_Slope;
+	m_ColorID = rhs.m_ColorID;
+	m_SliceID = rhs.m_SliceID;
 	return *this;
 }
 
@@ -105,11 +112,6 @@ int CTriangle::ReadTriangle(CSolidSTL *pstl, int iIndex)
 	//	return 0;
 	//}
 	return -1;
-}
-
-void CTriangle::SetNormal(CVertex &aN)
-{
-	m_Normal = aN;
 }
 
 CVertex CTriangle::ComputeNormal()
@@ -142,6 +144,30 @@ CVertex CTriangle::ComputeNormal()
 	}
 	m_Normal = f;
 	return f;
+}
+
+CVertex CTriangle::ComputeCentroid()
+{
+	CVertex &v1= m_vert[0];
+	CVertex &v2= m_vert[1];
+	CVertex &v3= m_vert[2];
+
+	m_Centroid = (m_vert[0] + m_vert[1] + m_vert[2]) / 3.0;
+
+	/*
+	char str[256];
+	sprintf_s(str, "Vertex 1 (x, y, z): (%lf, %lf, %lf)\n", v1.getVec()[0], v1.getVec()[1], v1.getVec()[2]);
+	OutputDebugString(str);
+	sprintf_s(str, "Vertex 2 (x, y, z): (%lf, %lf, %lf)\n", v2.getVec()[0], v2.getVec()[1], v2.getVec()[2]);
+	OutputDebugString(str);
+	sprintf_s(str, "Vertex 3 (x, y, z): (%lf, %lf, %lf)\n", v3.getVec()[0], v3.getVec()[1], v3.getVec()[2]);
+	OutputDebugString(str);
+	sprintf_s(str, "Centroid (x, y, z): (%lf, %lf, %lf)\n", m_Centroid.getVec()[0], m_Centroid.getVec()[1], m_Centroid.getVec()[2]);
+	OutputDebugString(str);
+	*/
+
+
+	return m_Centroid;
 }
 
 double CTriangle::CalcArea()
@@ -225,12 +251,12 @@ double CTriangle::CalcSlope()
 	double angle = acos(m_Norm_Dot_m_Ref);
 
 	if (abs(angle - M_PI / 2.0) < 1e-06) {
-		printf("slope = %lf\n", INFINITY);
+		m_Slope = INFINITY;
 		return INFINITY;
 	}
 	else {
 		double slope = tan(angle);
-		printf("slope = %lf\n", slope);
+		m_Slope = slope;
 		return slope;
 	}
 }
@@ -563,19 +589,23 @@ int CTriangle::Read_BinarySTLFile(CString &STLFileName, CTriangle *&pArray_Tri)
 CTriangleID::CTriangleID(void)
 {	
 	mTag = 0;
-	mColorID = -1;
+	m_ColorID = -1;
+	m_SliceID = -1;
 	m_ShellNum = -1;
 }
 
 CTriangleID::CTriangleID(const CTriangleID &rhs)
 {
 	mTag = rhs.mTag;
-	mColorID = rhs.mColorID;
+	m_ColorID = rhs.m_ColorID;
+	m_SliceID = rhs.m_SliceID;
 	m_vert[0] = rhs.m_vert[0];
 	m_vert[1] = rhs.m_vert[1];
 	m_vert[2] = rhs.m_vert[2];
 	m_Normal = rhs.m_Normal;
+	m_Centroid = rhs.m_Centroid;
 	m_Area = rhs.m_Area;
+	m_Slope = rhs.m_Slope;
 	m_ShellNum = rhs.m_ShellNum;
 }
 
@@ -585,19 +615,23 @@ CTriangleID::CTriangleID(const int p0,const int p1,  const int p2)
 	m_vert[1] = p1;
 	m_vert[2] = p2;
 	mTag = 0;
-	mColorID = -1;
+	m_ColorID = -1;
+	m_SliceID = -1;
 	m_ShellNum = -1;
 }      
 
 CTriangleID& CTriangleID::operator =(const CTriangleID &rhs)
 {
 	mTag = rhs.mTag;
-	mColorID = rhs.mColorID;
+	m_ColorID = rhs.m_ColorID;
+	m_SliceID = rhs.m_SliceID;
 	m_vert[0] = rhs.m_vert[0];
 	m_vert[1] = rhs.m_vert[1];
 	m_vert[2] = rhs.m_vert[2];
 	m_Normal = rhs.m_Normal;
+	m_Centroid = rhs.m_Centroid;
 	m_Area = rhs.m_Area;
+	m_Slope = rhs.m_Slope;
 	m_ShellNum = rhs.m_ShellNum;
 	return *this;
 }
@@ -605,10 +639,5 @@ CTriangleID& CTriangleID::operator =(const CTriangleID &rhs)
 int CTriangleID::operator [](int i)
 {  
 	return m_vert[i];
-}
-
-void CTriangleID::SetNormal(CVertex &aN)
-{
-	m_Normal = aN;
 }
 

@@ -25,6 +25,12 @@ float SolidSTL_Viewer::m_PartColorRed[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
 float SolidSTL_Viewer::m_PartColorGreen[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
 float SolidSTL_Viewer::m_PartColorBlue[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
 
+float SolidSTL_Viewer::m_RegionColor[3][4] = { 
+												{ 1.0f, 0.0f, 0.0f, 1.0f },
+												{ 0.0f, 1.0f, 0.0f, 1.0f },
+												{ 0.0f, 0.0f, 1.0f, 1.0f }
+											 };
+
 float SolidSTL_Viewer::m_AmbientLight[4] = { 0.35f, 0.35f, 0.35f, 1.0f };
 float SolidSTL_Viewer::m_DiffuseLight[4] = { 0.35f, 0.35f, 0.35f, 1.0f };
 
@@ -171,30 +177,10 @@ void SolidSTL_Viewer::DrawModel_Points( SolidSTL *psolid, int ViewSkipVert)
 
 	glPointSize(3.0f);
 
+	glColor4fv(m_PartColor);
 	for(int ctr=0; ctr<psolid->mVert_Num; ctr=ctr + ViewSkipVert)
 	{
 		CVertex v1 = psolid->mVertArray[ctr].Position();
-
-		int n = rand() % 4 + 0;
-		switch (n) {
-		case 0:
-			glColor4fv(m_PartColor);
-			break;
-		case 1:
-			glColor4fv(m_PartColorRed);
-			break;
-		case 2:
-			glColor4fv(m_PartColorGreen);
-			break;
-		case 3:
-			glColor4fv(m_PartColorBlue);
-			break;
-		default:
-			glColor4fv(m_PartColor);
-			break;
-		}
-
-
 		glBegin(GL_POINTS);
 			glVertex3f((float)v1[AXIS_X], (float)v1[AXIS_Y], (float)v1[AXIS_Z]);
 		glEnd();			
@@ -229,9 +215,10 @@ void SolidSTL_Viewer::DrawModel_WireFrameShaded( SolidSTL *psolid, float m_Light
 	IModelMatrix.GetTransformedHVertex(m_LightPos, LocalLight0);
 	glLightfv(GL_LIGHT0, GL_POSITION, LocalLight0);
 
-//	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColor);
+	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColor);
 	for (int i=psolid->m_startDpyList; i <= psolid->m_endDpyList; i++)
 	{
+		/*
 		int n = rand() % 4 + 0;
 		switch (n) {
 		case 0:
@@ -250,6 +237,7 @@ void SolidSTL_Viewer::DrawModel_WireFrameShaded( SolidSTL *psolid, float m_Light
 			glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColor);
 			break;
 		}
+		*/
 		glCallList(i);
 	}
 
@@ -268,6 +256,7 @@ void SolidSTL_Viewer::DrawModel_WireFrameShaded( SolidSTL *psolid, float m_Light
 
 	glPopMatrix(); // restore the current view matrix
 }
+
 void SolidSTL_Viewer::DrawModel_ColorSTL(SolidSTL *psolid, float m_LightPos[4])
 {
 	if (psolid == NULL) return;
@@ -278,43 +267,158 @@ void SolidSTL_Viewer::DrawModel_ColorSTL(SolidSTL *psolid, float m_LightPos[4])
 	SetModelTransform(psolid);
 
 	glEnable(GL_CULL_FACE);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHT0);
+
 	// Set the light model
-	glLightfv(GL_LIGHT0, GL_AMBIENT, m_AmbientLight);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, m_DiffuseLight);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
+	//glLightfv(GL_LIGHT0, GL_AMBIENT, m_AmbientLight);
+	//glLightfv(GL_LIGHT0, GL_DIFFUSE, m_DiffuseLight);
+	//glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHT0);
+	//glDisable(GL_LIGHTING);
 	glPolygonMode(GL_FRONT, GL_FILL);
 	glPolygonMode(GL_BACK, GL_FILL);
+	//glEnable(GL_BLEND);
+	//glEnable(GL_LINE_SMOOTH);
+	//glEnable(GL_POLYGON_SMOOTH);
+	glShadeModel(GL_SMOOTH);
 
-	// display shade triangles
-	GLfloat LocalLight0[4];
-	CTransMatrix IModelMatrix;
-	if (psolid->m_MatrixList.IsEmpty() == FALSE)
-		IModelMatrix = psolid->m_MatrixList.GetTail();
-	IModelMatrix.Inverse();
-	IModelMatrix.GetTransformedHVertex(m_LightPos, LocalLight0);
-	glLightfv(GL_LIGHT0, GL_POSITION, LocalLight0);
+	// display
+	//GLfloat LocalLight0[4];
+	//  	CTransMatrix IModelMatrix;
+	//if(psolid->m_MatrixList.GetSize() > 0) 
+	//	IModelMatrix = psolid->m_MatrixList.GetTail();
+	//IModelMatrix.Inverse();
+	//IModelMatrix.GetTransformedHVertex(m_LightPos, LocalLight0);
+	//glLightfv(GL_LIGHT0, GL_POSITION, LocalLight0);
+	float CurvColor[3][4] =
+	{ { 1.0f, 0.0f, 0.0f, 1.0f },
+	{ 0.0f, 1.0f, 0.0f, 1.0f },
+	{ 0.0f, 0.0f, 1.0f, 1.0f }
+	};
 
-	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColorRed);
-	for (int i = psolid->m_startDpyList; i <= psolid->m_endDpyList; i++)
+	glBegin(GL_TRIANGLES);
+
+
+	//determining slice no
+	double min = INFINITY;
+	double max = -INFINITY;
+	for (int i = 0; i < psolid->mTri_Num; i++)
 	{
-		glCallList(i);
+		CVertex Centroid = psolid->mTriArray[i].Centroid();
+		double triZ = Centroid.getVec()[2];
+
+		if (triZ > max)
+			max = triZ;
+		if (triZ < min)
+			min = triZ;
 	}
 
-	//// display wireframe
-	//glDisable(GL_LIGHTING);
-	//glDisable(GL_LIGHT0);
-	//glPolygonMode(GL_FRONT, GL_LINE);
-	//glPolygonMode(GL_BACK, GL_LINE);
-	//glLineWidth(2.0f);
-	//glColor4fv(m_PartColor);
-	//for (int i = psolid->m_startDpyList; i <= psolid->m_endDpyList; i++)
-	//{
-	//	glCallList(i);
-	//}
-	//glLineWidth(1.0f);
+	double SLICE_THICKNESS = (max - min) / 1000000;
+	int MAX_SLICE_NO = (int)(max / SLICE_THICKNESS);
+
+	float mSliceColor[4];
+	char str[256];
+	
+	int *mSliceColorID = new int[MAX_SLICE_NO]; 
+	fill_n(mSliceColorID, MAX_SLICE_NO, -1);  // initialize slice color id
+
+	for (int i = 0; i < psolid->mTri_Num; i++)
+	{
+		CVertex v1 = psolid->mVertArray[psolid->mTriArray[i][0]].Position();
+		CVertex v2 = psolid->mVertArray[psolid->mTriArray[i][1]].Position();
+		CVertex v3 = psolid->mVertArray[psolid->mTriArray[i][2]].Position();
+		//v1.getVec()[3]
+		CVertex Norm = psolid->mTriArray[i].Normal();
+
+		CVertex Centroid = psolid->mTriArray[i].Centroid();
+		double triZ = Centroid.getVec()[2];
+		int sliceID = (int)(triZ / SLICE_THICKNESS);
+
+		double v1_z = v1.getVec()[2];
+		double v2_z = v2.getVec()[2];
+		double v3_z = v3.getVec()[2];
+
+		int sliceID1 = (int)(v1_z / SLICE_THICKNESS);
+		int sliceID2 = (int)(v2_z / SLICE_THICKNESS);
+		int sliceID3 = (int)(v3_z / SLICE_THICKNESS);
+
+		sliceID = (sliceID1 + sliceID2 + sliceID3) / 3 ;
+	
+		sprintf_s(str, "sid1 = %d sid2 = %d sid3 = %d sid = %d \n", sliceID1, sliceID2, sliceID3, sliceID);
+		OutputDebugString(str);
+
+		psolid->mTriArray[i].SetSliceID(sliceID);
+
+		double Norm_z = Norm.getVec()[2];
+
+		int colorID;
+		if (Norm_z > 0) { // Up slope  ,   Red Color
+			colorID = 0;
+			//sprintf_s(str, "Tri_z = %lf \n slice#= %d \n Norm_z = %lf \n Green Color \n \n", triZ, sliceID, Norm_z);
+			//OutputDebugString(str);
+		}
+		else if (Norm_z < 0) { // Down slope   ,  Green Color
+			colorID = 1;
+			//sprintf_s(str, "Tri_z = %lf \n slice#= %d \n Norm_z = %lf \n Red Color \n \n", triZ, sliceID, Norm_z);
+			//OutputDebugString(str);
+		}
+		else {  // Vertical    ,   Blue Color
+			colorID = 2;
+			//sprintf_s(str, "Tri_z = %lf \n slice#= %d \n Norm_z = %lf \n Blue Color \n \n", triZ, sliceID, Norm_z);
+			//OutputDebugString(str);
+		}
+
+		psolid->mTriArray[i].SetColorID(colorID);
+		/*
+		int sliceColorID = mSliceColorID[sliceID];
+		if (sliceColorID != -1) {
+			mSliceColorID[sliceID] = sliceColorID = colorID;
+			psolid->mTriArray[i].SetColorID(colorID);
+		}
+		else {
+			if (sliceColorID == 1 || colorID == 1)    // triangle in downslope, if any triangle has downslope in the slice, all triangle will have downslope
+				psolid->mTriArray[i].SetColorID(1);
+			else if (sliceColorID == 0 || colorID == 0) // triangle in up slope
+				psolid->mTriArray[i].SetColorID(0);
+			else
+				psolid->mTriArray[i].SetColorID(0); // triangle in 2.5 D
+		}
+		*/
+	}
+
+	for (int i = 0; i<psolid->mTri_Num; i++)
+	{
+		CVertex v1 = psolid->mVertArray[psolid->mTriArray[i][0]].Position();
+		CVertex v2 = psolid->mVertArray[psolid->mTriArray[i][1]].Position();
+		CVertex v3 = psolid->mVertArray[psolid->mTriArray[i][2]].Position();
+		//v1.getVec()[3]
+		CVertex Norm = psolid->mTriArray[i].Normal();
+
+		glNormal3f((float)Norm[AXIS_X], (float)Norm[AXIS_Y], (float)Norm[AXIS_Z]);
+		//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[0]);
+		
+		int colorID = psolid->mTriArray[i].ColorID();
+		glColor4fv(m_RegionColor[colorID]);
+
+		glVertex3f((float)v1[AXIS_X], (float)v1[AXIS_Y], (float)v1[AXIS_Z]);
+		//glColor3f(m_RegionColor[1][0], m_RegionColor[1][1], m_RegionColor[1][2]);
+		//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[1]);
+		//glColor3f(0.0, 0.0, 1.0);
+		glVertex3f((float)v2[AXIS_X], (float)v2[AXIS_Y], (float)v2[AXIS_Z]);
+		//glColor3f(m_RegionColor[2][0], m_RegionColor[2][1], m_RegionColor[2][2]);
+		//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[2]);
+		//glColor3f(0.0, 1.0, 0.0);
+		glVertex3f((float)v3[AXIS_X], (float)v3[AXIS_Y], (float)v3[AXIS_Z]);
+	}
+	glEnd();
 
 	glPopMatrix(); // restore the current view matrix
+
+	glDisable(GL_BLEND);
+	//glDisable(GL_LINE_SMOOTH);
+	//glDisable(GL_POLYGON_SMOOTH);
+	glShadeModel(GL_FLAT);
 }
 
 
@@ -460,16 +564,16 @@ void SolidSTL_Viewer::DrawModel_Curvature( SolidSTL *psolid, float m_LightPos[4]
 		CVertex Norm = psolid->mTriArray[i].Normal();
 
 		glNormal3f((float)Norm[AXIS_X], (float)Norm[AXIS_Y], (float)Norm[AXIS_Z]);
-		glColor3f(1.0, 0.0, 0.0);
-		//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[0]);
+		//glColor3f(1.0, 0.0, 0.0);
+		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[0]);
 		glVertex3f((float)v1[AXIS_X], (float)v1[AXIS_Y], (float)v1[AXIS_Z]);
-		glColor3f(0.0, 0.0, 1.0);
-		//glColor3f(m_RegionColor[1][0], m_RegionColor[1][1], m_RegionColor[1][2]);
-		//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[1]);
+		//glColor3f(0.0, 0.0, 1.0);
+		glColor3f(m_RegionColor[1][0], m_RegionColor[1][1], m_RegionColor[1][2]);
+		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[1]);
 		glVertex3f((float)v2[AXIS_X], (float)v2[AXIS_Y], (float)v2[AXIS_Z]);
-		glColor3f(0.0, 1.0, 0.0);
-		//glColor3f(m_RegionColor[2][0], m_RegionColor[2][1], m_RegionColor[2][2]);
-		//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[2]);
+		//glColor3f(0.0, 1.0, 0.0);
+		glColor3f(m_RegionColor[2][0], m_RegionColor[2][1], m_RegionColor[2][2]);
+		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[2]);
 		glVertex3f((float)v3[AXIS_X], (float)v3[AXIS_Y], (float)v3[AXIS_Z]);
 	}	
 	glEnd();
