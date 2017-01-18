@@ -1,0 +1,1250 @@
+diff --git a/MeshTestbed/C++/DemoInfo.cpp b/MeshTestbed/C++/DemoInfo.cpp
+index 1fc65a6..c04b00c 100644
+--- a/MeshTestbed/C++/DemoInfo.cpp
++++ b/MeshTestbed/C++/DemoInfo.cpp
+@@ -25,6 +25,7 @@ CDemoInfo::CDemoInfo(CWnd* pParent /*=NULL*/)
+ 	: CDialogBar()
+ 	, bCheck1(true)
+ 	, bCheck2(true)
++	, mTime(0)
+ {
+ 	//{{AFX_DATA_INIT(CDemoInfo)
+ 	mEditVertNum = 0.0;
+@@ -39,6 +40,7 @@ CDemoInfo::CDemoInfo(CWnd* pParent /*=NULL*/)
+ 
+ void CDemoInfo::DoDataExchange(CDataExchange* pDX)
+ {
++	aPdx = pDX;
+ 	CDialogBar::DoDataExchange(pDX);
+ 	BOOL temCheck1 = bCheck1;
+ 	BOOL temCheck2 = bCheck2;
+@@ -50,6 +52,7 @@ void CDemoInfo::DoDataExchange(CDataExchange* pDX)
+ 	DDX_Text(pDX, IDC_EDIT_EXTX, mEditExtX);
+ 	DDX_Text(pDX, IDC_EDIT_EXTY, mEditExtY);
+ 	DDX_Text(pDX, IDC_EDIT_EXTZ, mEditExtZ);
++	DDX_Text(pDX, IDC_EDIT3, mTime);
+ 	DDX_Check(pDX, IDC_CHECK1, temCheck1);
+     DDX_Check(pDX, IDC_CHECK2, temCheck2);
+ 	//}}AFX_DATA_MAP
+@@ -121,3 +124,10 @@ void CDemoInfo::OnBnClickedCheck2()
+ {
+ 	bCheck2 = !bCheck2;
+ }
++
++void CDemoInfo::updateTime(double Time) {
++	mTime = Time;
++	char str[256];
++	sprintf(str, "%.2lf", mTime);
++	SetDlgItemText(IDC_EDIT3, str);
++}
+\ No newline at end of file
+diff --git a/MeshTestbed/C++/DemoInfo.h b/MeshTestbed/C++/DemoInfo.h
+index 5e86691..96d6123 100644
+--- a/MeshTestbed/C++/DemoInfo.h
++++ b/MeshTestbed/C++/DemoInfo.h
+@@ -25,6 +25,7 @@ class CDemoInfo : public CDialogBar
+ // Construction
+ public:
+ 	CDemoInfo(CWnd* pParent = NULL);   // standard constructor
++	CDataExchange* aPdx;
+ 
+ // Dialog Data
+ 	//{{AFX_DATA(CDemoInfo)
+@@ -40,7 +41,6 @@ public:
+ 	bool bCheck1;
+ 	bool bCheck2;
+ 
+-
+ protected:
+ 	// Overrides
+ 	// ClassWizard generated virtual function overrides
+@@ -61,10 +61,13 @@ public:
+ 	void GetEditHandleNumValue(double &EditHandleNumValue);
+ 	void GetEditExtValues(double *PartExt);
+ 
++	void updateTime(double Time);
++
+ 	afx_msg void OnBnClickedCheck1();
+ 	afx_msg void OnBnClickedCheck2();
+ 	//}}AFX_MSG
+ 	DECLARE_MESSAGE_MAP()
++	double mTime;
+ };
+ 
+ //{{AFX_INSERT_LOCATION}}
+diff --git a/MeshTestbed/C++/MeshTestbed.rc b/MeshTestbed/C++/MeshTestbed.rc
+index 667d8aa..f8d4453 100644
+--- a/MeshTestbed/C++/MeshTestbed.rc
++++ b/MeshTestbed/C++/MeshTestbed.rc
+@@ -110,12 +110,12 @@ BEGIN
+     BUTTON      ID_VIEW_ZOOMOUT
+     BUTTON      ID_VIEW_ZOOMWINDOW
+     SEPARATOR
+-    BUTTON      ID_VIEW_ZOOMIN
++    BUTTON      ID_VIEW_WIREFRAMESHADED
+     BUTTON      ID_VIEW_WIREFRAME
+     BUTTON      ID_VIEW_WIREFRAMENOFLAT
+     BUTTON      ID_VIEW_POINT
+     BUTTON      ID_VIEW_EXTENT
+-	BUTTON      ID_VIEW_COLORSTL
++    BUTTON      ID_VIEW_COLORSTL
+ END
+ 
+ 
+@@ -205,11 +205,11 @@ STYLE DS_SETFONT | WS_CHILD
+ FONT 8, "MS Sans Serif", 0, 0, 0x0
+ BEGIN
+     LTEXT           "Vert #",IDC_STATIC,14,24,22,12
+-    GROUPBOX        "Group1",IDC_STATIC,7,7,72,141
++    GROUPBOX        "Group1",IDC_STATIC,7,6,75,142
+     EDITTEXT        IDC_EDIT_VERTNUM,39,21,31,14,ES_AUTOHSCROLL
+     CONTROL         "Check1",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,156,41,10
+     CONTROL         "Check2",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,171,41,10
+-    GROUPBOX        "Group2",IDC_STATIC,7,186,72,62
++    GROUPBOX        "Group2",IDC_STATIC,7,147,75,37
+     CONTROL         "Radio1",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON,15,201,39,10
+     CONTROL         "Radio2",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,15,217,39,10
+     CONTROL         "Radio3",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,14,231,39,10
+@@ -223,9 +223,11 @@ BEGIN
+     EDITTEXT        IDC_EDIT_EXTZ,39,130,31,14,ES_AUTOHSCROLL
+     LTEXT           "Handle #",IDC_STATIC,12,63,24,14
+     EDITTEXT        IDC_EDIT_HANDLENUM,37,62,34,14,ES_AUTOHSCROLL
+-	GROUPBOX        "Group3", IDC_STATIC, 7, 250, 72, 30
+-	LTEXT           "Timer:", IDC_STATIC, 12, 260, 24, 14
+-	EDITTEXT        IDC_EDIT_EXTX, 39, 257, 31, 14, ES_AUTOHSCROLL
++    GROUPBOX        "Group3",IDC_STATIC,7,188,75,60
++    GROUPBOX        "Group4",IDC_STATIC,7,250,75,31
++    LTEXT           "Timer",IDC_STATIC,14,263,18,8
++    EDITTEXT        IDC_EDIT3,34,260,29,15,ES_AUTOHSCROLL
++    LTEXT           "ms",IDC_STATIC,65,263,10,8
+ END
+ 
+ 
+@@ -249,7 +251,7 @@ VS_VERSION_INFO VERSIONINFO
+ BEGIN
+     BLOCK "StringFileInfo"
+     BEGIN
+-        BLOCK "040904B0"
++        BLOCK "040904b0"
+         BEGIN
+             VALUE "FileDescription", "MeshTestbed MFC Application"
+             VALUE "FileVersion", "1, 0, 0, 1"
+@@ -286,9 +288,9 @@ BEGIN
+     IDD_DIALOG_DEMOINFO, DIALOG
+     BEGIN
+         LEFTMARGIN, 7
+-        RIGHTMARGIN, 79
++        RIGHTMARGIN, 82
+         TOPMARGIN, 6
+-        BOTTOMMARGIN, 248
++        BOTTOMMARGIN, 303
+     END
+ END
+ #endif    // APSTUDIO_INVOKED
+@@ -296,6 +298,17 @@ END
+ 
+ /////////////////////////////////////////////////////////////////////////////
+ //
++// AFX_DIALOG_LAYOUT
++//
++
++IDD_DIALOG_DEMOINFO AFX_DIALOG_LAYOUT
++BEGIN
++    0
++END
++
++
++/////////////////////////////////////////////////////////////////////////////
++//
+ // String Table
+ //
+ 
+diff --git a/MeshTestbed/C++/MeshTestbed.vcxproj b/MeshTestbed/C++/MeshTestbed.vcxproj
+index 7d581f7..a76c216 100644
+--- a/MeshTestbed/C++/MeshTestbed.vcxproj
++++ b/MeshTestbed/C++/MeshTestbed.vcxproj
+@@ -189,4 +189,9 @@
+   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+   <ImportGroup Label="ExtensionTargets">
+   </ImportGroup>
++  <ProjectExtensions>
++    <VisualStudio>
++      <UserProperties RESOURCE_FILE="MeshTestbed.rc" />
++    </VisualStudio>
++  </ProjectExtensions>
+ </Project>
+\ No newline at end of file
+diff --git a/MeshTestbed/C++/MeshTestbed.vcxproj.filters b/MeshTestbed/C++/MeshTestbed.vcxproj.filters
+index 00bb3a7..d3eab45 100644
+--- a/MeshTestbed/C++/MeshTestbed.vcxproj.filters
++++ b/MeshTestbed/C++/MeshTestbed.vcxproj.filters
+@@ -1,10 +1,6 @@
+ ﻿<?xml version="1.0" encoding="utf-8"?>
+ <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup>
+-    <Filter Include="Source Files">
+-      <UniqueIdentifier>{c6dc5232-61ea-4062-afbc-56a0a3275c51}</UniqueIdentifier>
+-      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+-    </Filter>
+     <Filter Include="Header Files">
+       <UniqueIdentifier>{35766d12-f6d5-40bd-88f8-33d473adc0fd}</UniqueIdentifier>
+       <Extensions>h;hpp;hxx;hm;inl</Extensions>
+@@ -13,6 +9,10 @@
+       <UniqueIdentifier>{4ad203e3-0b8b-4336-8d44-23f6a2575adb}</UniqueIdentifier>
+       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+     </Filter>
++    <Filter Include="Source Files">
++      <UniqueIdentifier>{c6dc5232-61ea-4062-afbc-56a0a3275c51}</UniqueIdentifier>
++      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
++    </Filter>
+   </ItemGroup>
+   <ItemGroup>
+     <ClCompile Include="DemoInfo.cpp">
+diff --git a/MeshTestbed/C++/MeshTestbedDoc.cpp b/MeshTestbed/C++/MeshTestbedDoc.cpp
+index 161fc46..81383a2 100644
+--- a/MeshTestbed/C++/MeshTestbedDoc.cpp
++++ b/MeshTestbed/C++/MeshTestbedDoc.cpp
+@@ -156,7 +156,7 @@ void CMeshTestbedDoc::OpenSTL(int aPartNum)
+ 		InputSTLFileName =  Fdlg.GetPathName();	
+ 		if(mPart[aPartNum] != NULL) delete mPart[aPartNum];
+ 		mPart[aPartNum] = new SolidSTL(InputSTLFileName);
+-		mPart[aPartNum]->Build(false, pFrame->m_wndProgressCtrl);
++		mPart[aPartNum]->Build(false, pFrame->m_wndProgressCtrl, pFrame->m_wndDemoInfoBar);
+ 
+ 		pFrame->m_wndDemoInfoBar->UpdateData(FALSE);
+ 
+diff --git a/MeshTestbed/C++/MeshTestbedView.cpp b/MeshTestbed/C++/MeshTestbedView.cpp
+index 3808114..09d9ae3 100644
+--- a/MeshTestbed/C++/MeshTestbedView.cpp
++++ b/MeshTestbed/C++/MeshTestbedView.cpp
+@@ -145,6 +145,10 @@ void CMeshTestbedView::DrawScene(void)
+ 	{
+ 		if(pdoc->mPart[i] != NULL)
+ 		{
++			double elapsed_time;
++			clock_t start;
++			char str[256];
++
+ 			switch(m_ViewMethod)
+ 			{
+ 			case Points:
+@@ -165,6 +169,13 @@ void CMeshTestbedView::DrawScene(void)
+ 			case Extent:
+ 				m_stlViewer->DrawModel_Extent( pdoc->mPart[i] );
+ 				break;
++			case ColorSTL:
++				start = clock();
++				m_stlViewer->DrawModel_ColorSTL( pdoc->mPart[i], m_LightPos );
++				elapsed_time = (clock() - start) / (double)(CLOCKS_PER_SEC / 1000.0);
++
++				pdoc->mPart[i]->aDemoInfo->updateTime(elapsed_time);
++				break;
+ 			default:
+ 				// do nothing
+ 				break;
+diff --git a/MeshTestbed/C++/Resource.h b/MeshTestbed/C++/Resource.h
+index 4a5ba21..9d2e751 100644
+--- a/MeshTestbed/C++/Resource.h
++++ b/MeshTestbed/C++/Resource.h
+@@ -26,6 +26,7 @@
+ #define IDC_EDIT_B3X                    1014
+ #define IDC_EDIT_B3Y                    1015
+ #define IDC_EDIT_B3Z                    1016
++#define IDC_EDIT3                       1018
+ #define ID_FILE_OPENSTL                 32771
+ #define ID_VIEW_ISO                     32772
+ #define ID_BUTTON32773                  32773
+@@ -56,15 +57,16 @@
+ #define ID_FILE_GENERATEBEZIER          32798
+ #define ID_FILE_GENERATEBEZIERSURF      32799
+ #define ID_VIEW_COLORSTL                32800
++#define ID_VIEW_SH                      32804
+ 
+ // Next default values for new objects
+ // 
+ #ifdef APSTUDIO_INVOKED
+ #ifndef APSTUDIO_READONLY_SYMBOLS
+ #define _APS_3D_CONTROLS                     1
+-#define _APS_NEXT_RESOURCE_VALUE        137
+-#define _APS_NEXT_COMMAND_VALUE         32804
+-#define _APS_NEXT_CONTROL_VALUE         1017
++#define _APS_NEXT_RESOURCE_VALUE        138
++#define _APS_NEXT_COMMAND_VALUE         32805
++#define _APS_NEXT_CONTROL_VALUE         1019
+ #define _APS_NEXT_SYMED_VALUE           101
+ #endif
+ #endif
+diff --git a/MeshTestbed/C++/STLS/10sporeRim.stl b/MeshTestbed/C++/STLS/10sporeRim.stl
+new file mode 100644
+index 0000000..999eb53
+Binary files /dev/null and b/MeshTestbed/C++/STLS/10sporeRim.stl differ
+diff --git a/MeshTestbed/C++/STLS/Icosaedron.stl b/MeshTestbed/C++/STLS/Icosaedron.stl
+new file mode 100644
+index 0000000..0401eca
+Binary files /dev/null and b/MeshTestbed/C++/STLS/Icosaedron.stl differ
+diff --git a/MeshTestbed/C++/STLS/Rhombicosidodecahedron.stl b/MeshTestbed/C++/STLS/Rhombicosidodecahedron.stl
+new file mode 100644
+index 0000000..e34e82d
+Binary files /dev/null and b/MeshTestbed/C++/STLS/Rhombicosidodecahedron.stl differ
+diff --git a/MeshTestbed/C++/STLS/dedecahedron unidentified object.stl b/MeshTestbed/C++/STLS/dedecahedron unidentified object.stl
+new file mode 100644
+index 0000000..d078869
+Binary files /dev/null and b/MeshTestbed/C++/STLS/dedecahedron unidentified object.stl differ
+diff --git a/MeshTestbed/C++/STLs/geometricshapeset__1_.stl b/MeshTestbed/C++/STLs/geometricshapeset__1_.stl
+new file mode 100644
+index 0000000..4525654
+Binary files /dev/null and b/MeshTestbed/C++/STLs/geometricshapeset__1_.stl differ
+diff --git a/MeshTestbed/C++/STLs/trinket.STL b/MeshTestbed/C++/STLs/trinket.STL
+new file mode 100644
+index 0000000..00e3a61
+Binary files /dev/null and b/MeshTestbed/C++/STLs/trinket.STL differ
+diff --git a/MeshTestbed/C++/SolidSTL.cpp b/MeshTestbed/C++/SolidSTL.cpp
+index 971fa37..cb35fa1 100644
+--- a/MeshTestbed/C++/SolidSTL.cpp
++++ b/MeshTestbed/C++/SolidSTL.cpp
+@@ -88,6 +88,8 @@ int SolidSTL::lastDpyList = 111;	// to make sure no redundant in the display lis
+ 
+ SolidSTL::SolidSTL(CString &aSTLFileName)
+ {
++	aDemoInfo = NULL;
++	m_ColorBuilt = false;
+ 	m_STLFileName = aSTLFileName;
+ 	mVertArray = NULL;
+ 	mTriArray = NULL;
+@@ -113,12 +115,12 @@ SolidSTL::~SolidSTL(void)
+ }
+ 
+ // call SolidCTL_Builder to complete all information from STL file
+-bool SolidSTL::Build(bool bSolidSTL, CProgressCtrl *aProgressCtrl)
++bool SolidSTL::Build(bool bSolidSTL, CProgressCtrl *aProgressCtrl, CDemoInfo *aDemoInfo)
+ {
+ 	Clean();
+ 	if(aProgressCtrl!=NULL) aProgressCtrl->SetPos(5);
+ 	SolidSTL_Builder sb;
+-	if(sb.Construct(m_STLFileName, this, bSolidSTL, aProgressCtrl)==false)
++	if(sb.Construct(m_STLFileName, this, bSolidSTL, aProgressCtrl, aDemoInfo)==false)
+ 	{
+ 		AfxMessageBox("This STL is bad! Please verify and fix it first before using the system."); 
+ 		return false;	
+diff --git a/MeshTestbed/C++/SolidSTL.h b/MeshTestbed/C++/SolidSTL.h
+index 41e6b3d..d9a0c89 100644
+--- a/MeshTestbed/C++/SolidSTL.h
++++ b/MeshTestbed/C++/SolidSTL.h
+@@ -15,6 +15,9 @@
+ #include "resource.h"		// main symbols
+ #include <afxtempl.h>
+ #include ".\TransMatrix.h"
++#include ".\DemoInfo.h"
++
++#define SLICE_THICKNESS 0.000001
+ 
+ enum edgeAttrib { UNKNOWN_E, CONVEX_E, FLAT_E, CONCAVE_E  };
+ enum triAttrib { UNKNOWN_T, CONVEX_T, CONCAVE_T };
+@@ -113,7 +116,9 @@ protected:
+ 	int m_endDpyList;
+ 	void CreateDisplayList(void);
+ 	void DeleteDpyLists(void);
++	bool m_ColorBuilt;
+ public:
++	CDemoInfo* aDemoInfo;
+ 	void UpdateDisplayList(void);
+ 	CList <CTransMatrix, CTransMatrix &> &getTransformList(void)
+ 	{
+@@ -123,7 +128,7 @@ public:
+ 	SolidSTL(CString &aSTLFileName);
+ 	~SolidSTL(void);
+ 	// call SolidCTL_Builder to complete all information
+-	bool Build(bool bSolidSTL, CProgressCtrl *aProgressCtrl=NULL);
++	bool Build(bool bSolidSTL, CProgressCtrl *aProgressCtrl=NULL, CDemoInfo *aDemoInfo=NULL);
+ 	bool Build(int TriNum, CTriangle *pArray_Tri, CProgressCtrl *aProgressCtrl=NULL);
+ 	bool saveSTL(CString &aFileName);
+ 	CString &getFileName(void)	{ return m_STLFileName;	}
+@@ -132,12 +137,14 @@ public:
+ 	int VertexNum()		{	return mVert_Num;	}
+ 	int HalfEdgeNum()	{	return mHE_Num;		}
+ 	int HandleNum()		{	return mHandle_Num;	}
++	bool ColorBuilt()   { return m_ColorBuilt;    }
+ 	CTriVertex& Vert(int avNum);
+ 	CTriangleID& Tri(int atNum);
+ 	CHalfEdge& Hedge(int aeNum);
+ 
+ 	int GetModelID()	{	return m_modelID;	};
+ 	void SetModelID(int modelID)	{ m_modelID = modelID;	}
++	void SetColorBuilt(bool b)		{ m_ColorBuilt = b;		}
+ 
+ 	// Manipulation functions
+ 	CTriangle getTri( int TriID);
+diff --git a/MeshTestbed/C++/SolidSTL_Builder.cpp b/MeshTestbed/C++/SolidSTL_Builder.cpp
+index 03616b0..10380cf 100644
+--- a/MeshTestbed/C++/SolidSTL_Builder.cpp
++++ b/MeshTestbed/C++/SolidSTL_Builder.cpp
+@@ -262,7 +262,7 @@ SolidSTL_Builder::~SolidSTL_Builder(void)
+ 
+ // return the data related to the STL file
+ bool SolidSTL_Builder::Construct(CString &STLFileName, SolidSTL *ap_solid, 
+-								 bool bSolidSTL, CProgressCtrl *aProgressCtrl)
++								 bool bSolidSTL, CProgressCtrl *aProgressCtrl, CDemoInfo *aDemoInfo)
+ {
+ 	if(ap_solid == NULL) return false;
+ 	mp_solid = ap_solid;
+@@ -271,7 +271,8 @@ bool SolidSTL_Builder::Construct(CString &STLFileName, SolidSTL *ap_solid,
+ 	CTriangle *pArray_Tri=NULL;		// temporary triangle table to store STL
+ 	if(Read_STL_File(STLFileName, pArray_Tri) <= 0) return false;
+ 	if(aProgressCtrl!=NULL) aProgressCtrl->SetPos(30);
+-	
++	ap_solid->aDemoInfo = aDemoInfo;
++
+ 	// check and delete non-regular triangles
+ 	if( bSolidSTL ) 
+ 		mp_solid->mTri_Num = RegulateTriangles(mp_solid->mTri_Num, pArray_Tri);
+@@ -292,6 +293,9 @@ bool SolidSTL_Builder::Construct(CString &STLFileName, SolidSTL *ap_solid,
+ 	mp_solid->CalcExtents();	// get the bounding box
+ 	VertArray.RemoveAll();	// no use any more
+ 
++	// Step *2: Determine slice and slice color and set triangle color id
++	//if(Build_CTL_Color_Logic2() != true) return false;
++
+ 	// Step 3: Build half-edge table
+ 	if(Build_Topology() == true) // topology of STL is good 
+ 	{
+@@ -322,7 +326,7 @@ bool SolidSTL_Builder::Construct(CString &STLFileName, SolidSTL *ap_solid,
+ 
+ // return the data related to the STL file
+ bool SolidSTL_Builder::Construct(int TriNum, CTriangle *pArray_Tri,
+-								 SolidSTL *ap_solid, CProgressCtrl *aProgressCtrl)
++								 SolidSTL *ap_solid, CProgressCtrl *aProgressCtrl, CDemoInfo *aDemoInfo)
+ {
+ 	if(ap_solid == NULL) return false;
+ 	mp_solid = ap_solid;
+@@ -604,39 +608,42 @@ bool SolidSTL_Builder::Build_Topology()
+ }
+ 
+ // from a CTriangle array, generate a CVertex Array and a CTriangleID array
+-bool SolidSTL_Builder::Build_CTL(CTriangle *&pArray_Tri, 
+-								 CArray <CVertex, CVertex&> &VertArray, 
+-								 CTriangleID *pTriIDArray)
++bool SolidSTL_Builder::Build_CTL(CTriangle *&pArray_Tri,
++	CArray <CVertex, CVertex&> &VertArray,
++	CTriangleID *pTriIDArray)
+ {
+ 	// get the vertices table
+-	int vert_Num = 3*mp_solid->mTri_Num;
++	int vert_Num = 3 * mp_solid->mTri_Num;
+ 	CSortVertex *tempArray_vertices = new CSortVertex[vert_Num];
+-	for(int i=0; i < mp_solid->mTri_Num;i++)
++	for (int i = 0; i < mp_solid->mTri_Num; i++)
+ 	{
+ 		CTriangle curT = pArray_Tri[i];
+ 		CSortVertex sv1(curT[0], i, 0);
+-		tempArray_vertices[i*3] = sv1;
++		tempArray_vertices[i * 3] = sv1;
+ 		CSortVertex sv2(curT[1], i, 1);
+-		tempArray_vertices[i*3+1] = sv2;
++		tempArray_vertices[i * 3 + 1] = sv2;
+ 		CSortVertex sv3(curT[2], i, 2);
+-		tempArray_vertices[i*3+2] = sv3;
++		tempArray_vertices[i * 3 + 2] = sv3;
+ 	}
++
+ 	// quick order the vertices
+-	CSortVertex::quick_sort_vertex_array(tempArray_vertices, 0, vert_Num-1);
++	CSortVertex::quick_sort_vertex_array(tempArray_vertices, 0, vert_Num - 1);
+ 
+ 	// build vertices table and TriangleID table
+-	for(int i=0; i < mp_solid->mTri_Num;i++)
++	for (int i = 0; i < mp_solid->mTri_Num; i++)
+ 	{
+ 		CTriangle curT = pArray_Tri[i];
+ 		pTriIDArray[i].SetNormal(curT.Normal());
++		pTriIDArray[i].SetCentroid(curT.Centroid());
+ 		pTriIDArray[i].SetArea(curT.Area());
++		pTriIDArray[i].SetSlope(curT.Slope());
+ 		pTriIDArray[i].SetTag(curT.tag());
+ 	}
+ 	int curVert_Num = -1;
+-	for(int i=0;i<vert_Num;i++)
++	for (int i = 0; i < vert_Num; i++)
+ 	{
+ 		// check to add new vertex
+-		if(curVert_Num < 0 || tempArray_vertices[i].m_vec != VertArray[curVert_Num])
++		if (curVert_Num < 0 || tempArray_vertices[i].m_vec != VertArray[curVert_Num])
+ 		{
+ 			VertArray.Add(tempArray_vertices[i].m_vec);
+ 			curVert_Num++;
+@@ -646,11 +653,11 @@ bool SolidSTL_Builder::Build_CTL(CTriangle *&pArray_Tri,
+ 		int VNum = tempArray_vertices[i].mVertNum;
+ 		pTriIDArray[TriNum].SetVertex(VNum, curVert_Num);
+ 	}
+-	
+-	mp_solid->mVert_Num = curVert_Num+1;
++
++	mp_solid->mVert_Num = curVert_Num + 1;
+ 
+ 	// temp CTriangle array is not used any more, delete it here
+-	delete []tempArray_vertices;
++	delete[]tempArray_vertices;
+ 
+ 	return true;
+ }
+@@ -708,8 +715,11 @@ int SolidSTL_Builder::Read_STL_File(CString &STLFileName, CTriangle *&pArray_Tri
+ 		CTriangle curT(v1, v2, v3);
+ 		///curT.SetNormal(normal);
+ 		curT.ComputeNormal();
++		curT.ComputeCentroid();
+ 		curT.CalcArea();
++		curT.CalcSlope();
+ 		curT.SetTag(attrib);
++
+ 		pArray_Tri[i]=curT;
+ 	}
+ 
+diff --git a/MeshTestbed/C++/SolidSTL_Builder.h b/MeshTestbed/C++/SolidSTL_Builder.h
+index d77ad02..ca46748 100644
+--- a/MeshTestbed/C++/SolidSTL_Builder.h
++++ b/MeshTestbed/C++/SolidSTL_Builder.h
+@@ -66,8 +66,8 @@ public:
+ 	~SolidSTL_Builder(void);
+ 
+ 	// build complete information for SolidSTL
+-	bool Construct(CString &STLFileName, SolidSTL *ap_Solid, bool bSolidSTL, CProgressCtrl *aProgressCtrl=NULL);
+-	bool Construct(int TriNum, CTriangle *pArray_Tri, SolidSTL *ap_Solid, CProgressCtrl *aProgressCtrl=NULL);
++	bool Construct(CString &STLFileName, SolidSTL *ap_Solid, bool bSolidSTL, CProgressCtrl *aProgressCtrl=NULL, CDemoInfo *aDemoInfo=NULL);
++	bool Construct(int TriNum, CTriangle *pArray_Tri, SolidSTL *ap_Solid, CProgressCtrl *aProgressCtrl=NULL, CDemoInfo *aDemoInfo=NULL);
+ 
+ protected:
+ 	// step 1
+diff --git a/MeshTestbed/C++/SolidSTL_Viewer.cpp b/MeshTestbed/C++/SolidSTL_Viewer.cpp
+index 8340be7..f99a2eb 100644
+--- a/MeshTestbed/C++/SolidSTL_Viewer.cpp
++++ b/MeshTestbed/C++/SolidSTL_Viewer.cpp
+@@ -20,7 +20,17 @@
+ #define new DEBUG_NEW
+ #endif
+ 
+-float SolidSTL_Viewer::m_PartColor[4] = {0.5f, 1.0f, 1.0f, 1.0f };
++float SolidSTL_Viewer::m_PartColor[4] = {0.0f, 1.0f, 1.0f, 1.0f };
++float SolidSTL_Viewer::m_PartColorRed[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
++float SolidSTL_Viewer::m_PartColorGreen[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
++float SolidSTL_Viewer::m_PartColorBlue[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
++
++float SolidSTL_Viewer::m_RegionColor[3][4] = { 
++												{ 1.0f, 0.0f, 0.0f, 1.0f },
++												{ 0.0f, 1.0f, 0.0f, 1.0f },
++												{ 0.0f, 0.0f, 1.0f, 1.0f }
++											 };
++
+ float SolidSTL_Viewer::m_AmbientLight[4] = { 0.35f, 0.35f, 0.35f, 1.0f };
+ float SolidSTL_Viewer::m_DiffuseLight[4] = { 0.35f, 0.35f, 0.35f, 1.0f };
+ 
+@@ -96,7 +106,7 @@ void SolidSTL_Viewer::DrawModel_WireFrameNoFlat( SolidSTL *psolid )
+ 	glDisable(GL_LIGHT0);
+ 	glPolygonMode (GL_FRONT, GL_LINE) ; 
+ 	glPolygonMode (GL_BACK, GL_LINE) ; 
+-	glColor4fv(m_PartColor);
++	//glColor4fv(m_PartColor);
+ 	glLineWidth(1.0f);
+ 
+ 	for(int i=0; i<psolid->HalfEdgeNum(); i++)
+@@ -110,6 +120,25 @@ void SolidSTL_Viewer::DrawModel_WireFrameNoFlat( SolidSTL *psolid )
+ 		CVertex v2 = psolid->Vert(iv2).Position();
+ 
+ 		glBegin(GL_LINES);
++		int n = rand() % 4 + 0;
++		switch (n) {
++		case 0:
++			glColor4fv(m_PartColor);
++			break;
++		case 1:
++			glColor4fv(m_PartColorRed);
++			break;
++		case 2:
++			glColor4fv(m_PartColorGreen);
++			break;
++		case 3:
++			glColor4fv(m_PartColorBlue);
++			break;
++		default:
++			glColor4fv(m_PartColor);
++			break;
++		}
++
+ 			glVertex3f((float)v1[AXIS_X], (float)v1[AXIS_Y], (float)v1[AXIS_Z]);
+ 			glVertex3f((float)v2[AXIS_X], (float)v2[AXIS_Y], (float)v2[AXIS_Z]);
+ 		glEnd();			
+@@ -145,14 +174,13 @@ void SolidSTL_Viewer::DrawModel_Points( SolidSTL *psolid, int ViewSkipVert)
+ 	glDisable(GL_LIGHT0);
+ 	glPolygonMode (GL_FRONT, GL_LINE) ; 
+ 	glPolygonMode (GL_BACK, GL_LINE) ; 
+-	glColor4fv(m_PartColor);
+ 
+ 	glPointSize(3.0f);
+ 
++	glColor4fv(m_PartColor);
+ 	for(int ctr=0; ctr<psolid->mVert_Num; ctr=ctr + ViewSkipVert)
+ 	{
+ 		CVertex v1 = psolid->mVertArray[ctr].Position();
+-
+ 		glBegin(GL_POINTS);
+ 			glVertex3f((float)v1[AXIS_X], (float)v1[AXIS_Y], (float)v1[AXIS_Z]);
+ 		glEnd();			
+@@ -190,6 +218,26 @@ void SolidSTL_Viewer::DrawModel_WireFrameShaded( SolidSTL *psolid, float m_Light
+ 	glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColor);
+ 	for (int i=psolid->m_startDpyList; i <= psolid->m_endDpyList; i++)
+ 	{
++		/*
++		int n = rand() % 4 + 0;
++		switch (n) {
++		case 0:
++			glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColor);
++			break;
++		case 1:
++			glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColorRed);
++			break;
++		case 2:
++			glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColorGreen);
++			break;
++		case 3:
++			glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColorBlue);
++			break;
++		default:
++			glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_PartColor);
++			break;
++		}
++		*/
+ 		glCallList(i);
+ 	}
+ 
+@@ -209,6 +257,293 @@ void SolidSTL_Viewer::DrawModel_WireFrameShaded( SolidSTL *psolid, float m_Light
+ 	glPopMatrix(); // restore the current view matrix
+ }
+ 
++bool SolidSTL_Viewer::Build_CTL_Color(SolidSTL* mp_solid) {
++	for (int i = 0; i < mp_solid->mTri_Num; i++)
++	{
++		// Determining slope color
++		CVertex Norm = mp_solid->mTriArray[i].Normal();
++		double Norm_z = Norm.getVec()[2];
++
++		// Current triangle slope and determine its color
++		int colorID;
++		if (Norm_z > 0) { // Up slope  ,   Red Color
++			colorID = 0;
++		}
++		else if (Norm_z < 0) { // Down slope   ,  Green Color
++			colorID = 1;
++		}
++		else {  // Vertical    ,   Blue Color
++			colorID = 2;
++		}
++
++		mp_solid->mTriArray[i].SetColorID(colorID);
++	}
++
++	return true;
++}
++
++bool SolidSTL_Viewer::Build_CTL_Color_Logic2(SolidSTL* mp_solid) {
++	//determining slice no
++	double minZ = INFINITY;
++	double maxZ = -INFINITY;
++	for (int i = 0; i < mp_solid->mTri_Num; i++)
++	{
++		CVertex v1 = mp_solid->mVertArray[mp_solid->mTriArray[i][0]].Position();
++		CVertex v2 = mp_solid->mVertArray[mp_solid->mTriArray[i][1]].Position();
++		CVertex v3 = mp_solid->mVertArray[mp_solid->mTriArray[i][2]].Position();
++
++		// Getting slice ID for each vertex of the triangle
++		double v1Z = v1.getVec()[2];
++		double v2Z = v2.getVec()[2];
++		double v3Z = v3.getVec()[2];
++
++		int sliceID1 = (int)((v1Z - minZ) / SLICE_THICKNESS);
++		int sliceID2 = (int)((v2Z - minZ) / SLICE_THICKNESS);
++		int sliceID3 = (int)((v3Z - minZ) / SLICE_THICKNESS);
++		int minSliceID = min(sliceID1, min(sliceID2, sliceID3));
++		int maxSliceID = max(sliceID1, max(sliceID2, sliceID3));
++
++		mp_solid->mTriArray[i].SetMinSliceID(minSliceID); // Lowest slice that includes the triangle
++		mp_solid->mTriArray[i].SetMaxSliceID(maxSliceID); // Highest slice that includes the triangle
++
++		double minZT = min(v1Z, min(v2Z, v3Z));
++		double maxZT = max(v1Z, max(v2Z, v3Z));
++
++		if (maxZT > maxZ)
++			maxZ = maxZT;
++		if (minZT < minZ)
++			minZ = minZT;
++	}
++
++	// Determining number of slices
++	int MAX_SLICE_NO = (int)((maxZ - minZ) / SLICE_THICKNESS);
++
++	// storage for slice color
++	int *mSliceColorID = new int[MAX_SLICE_NO]; 
++	fill_n(mSliceColorID, MAX_SLICE_NO, -1);  // initialize slice color id
++
++	for (int i = 0; i < mp_solid->mTri_Num; i++)
++	{
++		int minSliceID = mp_solid->mTriArray[i].MinSliceID();
++		int maxSliceID = mp_solid->mTriArray[i].MaxSliceID();
++
++		// Determining slope color
++		CVertex Norm = mp_solid->mTriArray[i].Normal();
++		double Norm_z = Norm.getVec()[2];
++
++		// Current triangle slope and determine its color
++		int colorID;
++		if (Norm_z > 0) { // Up slope  ,   Red Color
++			colorID = 0;
++		}
++		else if (Norm_z < 0) { // Down slope   ,  Green Color
++			colorID = 1;
++		}
++		else {  // Vertical    ,   Blue Color
++			colorID = 2;
++		}
++
++		// setting color id for all slices in between the triangle
++		// Check whether other slices are already colored
++		// Checking slice color and updating with priority DOWN > UP > 2.5D
++		int sliceColorID = mSliceColorID[0];
++		for (int k = minSliceID; k < maxSliceID; k++) {
++			if (sliceColorID == 1 || colorID == 1) {    // triangle in downslope, if any triangle has downslope in the slice, all triangle will have downslope
++				sliceColorID = colorID = 1;
++				mSliceColorID[k] = 1;
++			}
++			else if (sliceColorID == 0 || colorID == 0) { // if this triangle or any any other triangle in the slice in up slope
++				sliceColorID = colorID = 0;
++				mSliceColorID[k] = 0;
++			}
++			else if (sliceColorID == 2 || colorID == 2) {// Vertical
++				sliceColorID = colorID = 2;
++				mSliceColorID[k] = 2;
++			}
++			else {	// slice not yet colored
++				sliceColorID = colorID;
++				mSliceColorID[k] = colorID;
++			}
++		}
++		
++		mp_solid->mTriArray[i].SetColorID(sliceColorID);
++
++	}
++
++	return true;
++}
++
++bool SolidSTL_Viewer::Build_CTL_Color_Logic3(SolidSTL* psolid) {
++	//determining slice no
++	double min = INFINITY;
++	double max = -INFINITY;
++	for (int i = 0; i < psolid->mTri_Num; i++)
++	{
++		CVertex Centroid = psolid->mTriArray[i].Centroid();
++		double triZ = Centroid.getVec()[2];
++		if (triZ > max)
++			max = triZ;
++		if (triZ < min)
++			min = triZ;
++	}
++
++	int MAX_SLICE_NO = (int)((max-min) / SLICE_THICKNESS);
++	
++	float mSliceColor[4];
++	char str[256];
++
++	int *mSliceColorID = new int[MAX_SLICE_NO];
++	fill_n(mSliceColorID, MAX_SLICE_NO, -1);  // initialize slice color id
++
++	for (int i = 0; i < psolid->mTri_Num; i++)
++	{
++		CVertex v1 = psolid->mVertArray[psolid->mTriArray[i][0]].Position();
++		CVertex v2 = psolid->mVertArray[psolid->mTriArray[i][1]].Position();
++		CVertex v3 = psolid->mVertArray[psolid->mTriArray[i][2]].Position();
++		//v1.getVec()[3]
++		CVertex Norm = psolid->mTriArray[i].Normal();
++
++		CVertex Centroid = psolid->mTriArray[i].Centroid();
++		double triZ = Centroid.getVec()[2];
++		int sliceID = (int)((triZ - min) / SLICE_THICKNESS);
++
++		double v1_z = v1.getVec()[2];
++		double v2_z = v2.getVec()[2];
++		double v3_z = v3.getVec()[2];
++
++		int sliceID1 = (int)((v1_z - min) / SLICE_THICKNESS);
++		int sliceID2 = (int)((v2_z - min) / SLICE_THICKNESS);
++		int sliceID3 = (int)((v3_z - min) / SLICE_THICKNESS);
++
++		sliceID = (sliceID1 + sliceID2 + sliceID3) / 3;
++		//sprintf_s(str, "sid1 = %d sid2 = %d sid3 = %d sid = %d \n", sliceID1, sliceID2, sliceID3, sliceID);
++		OutputDebugString(str);
++
++		psolid->mTriArray[i].SetMinSliceID(sliceID);
++
++		double Norm_z = Norm.getVec()[2];
++
++		int colorID;
++		if (Norm_z > 0) { // Up slope  ,   Red Color
++			colorID = 0;
++		}
++		else if (Norm_z < 0) { // Down slope   ,  Green Color
++			colorID = 1;
++		}
++		else {  // Vertical    ,   Blue Color
++			colorID = 2;
++		}
++
++		psolid->mTriArray[i].SetColorID(colorID);
++
++		/*
++		int sliceColorID = mSliceColorID[sliceID];
++		if (sliceColorID != -1) {
++			mSliceColorID[sliceID] = sliceColorID = colorID;
++			psolid->mTriArray[i].SetColorID(colorID);
++		}
++		else {
++			if (sliceColorID == 1 || colorID == 1)    // triangle in downslope, if any triangle has downslope in the slice, all triangle will have downslope
++				 psolid->mTriArray[i].SetColorID(1);
++			else if (sliceColorID == 0 || colorID == 0) // triangle in up slope
++				 psolid->mTriArray[i].SetColorID(0);
++			else
++				 psolid->mTriArray[i].SetColorID(0); // triangle in 2.5 D
++			}
++		*/
++	}
++	return true;
++}
++
++
++void SolidSTL_Viewer::DrawModel_ColorSTL(SolidSTL *psolid, float m_LightPos[4])
++{
++	if (psolid == NULL) return;
++	if (psolid->ColorBuilt() == false) {
++		// logic 1
++		//Build_CTL_Color(psolid);
++		// logic 2
++		// Build_CTL_Color_Logic2(psolid);
++		// logic 3
++		Build_CTL_Color_Logic3(psolid);
++		psolid->SetColorBuilt(true);
++	}
++
++
++	// first combine the transformation of SolidSTL
++	glMatrixMode(GL_MODELVIEW);
++	glPushMatrix(); // store the current view matrix
++	SetModelTransform(psolid);
++
++	glEnable(GL_CULL_FACE);
++	glDisable(GL_LIGHTING);
++	glDisable(GL_LIGHT0);
++
++	// Set the light model
++	//glLightfv(GL_LIGHT0, GL_AMBIENT, m_AmbientLight);
++	//glLightfv(GL_LIGHT0, GL_DIFFUSE, m_DiffuseLight);
++	//glEnable(GL_LIGHTING);
++	//glEnable(GL_LIGHT0);
++	//glDisable(GL_LIGHTING);
++	glPolygonMode(GL_FRONT, GL_FILL);
++	glPolygonMode(GL_BACK, GL_FILL);
++	//glEnable(GL_BLEND);
++	//glEnable(GL_LINE_SMOOTH);
++	//glEnable(GL_POLYGON_SMOOTH);
++	glShadeModel(GL_SMOOTH);
++
++	// display
++	//GLfloat LocalLight0[4];
++	//  	CTransMatrix IModelMatrix;
++	//if(psolid->m_MatrixList.GetSize() > 0) 
++	//	IModelMatrix = psolid->m_MatrixList.GetTail();
++	//IModelMatrix.Inverse();
++	//IModelMatrix.GetTransformedHVertex(m_LightPos, LocalLight0);
++	//glLightfv(GL_LIGHT0, GL_POSITION, LocalLight0);
++	float CurvColor[3][4] =
++	{ { 1.0f, 0.0f, 0.0f, 1.0f },
++	{ 0.0f, 1.0f, 0.0f, 1.0f },
++	{ 0.0f, 0.0f, 1.0f, 1.0f }
++	};
++
++	glBegin(GL_TRIANGLES);
++
++
++	for (int i = 0; i<psolid->mTri_Num; i++)
++	{
++		CVertex v1 = psolid->mVertArray[psolid->mTriArray[i][0]].Position();
++		CVertex v2 = psolid->mVertArray[psolid->mTriArray[i][1]].Position();
++		CVertex v3 = psolid->mVertArray[psolid->mTriArray[i][2]].Position();
++		//v1.getVec()[3]
++		CVertex Norm = psolid->mTriArray[i].Normal();
++
++		glNormal3f((float)Norm[AXIS_X], (float)Norm[AXIS_Y], (float)Norm[AXIS_Z]);
++		//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[0]);
++		
++		int colorID = psolid->mTriArray[i].ColorID();
++		glColor4fv(m_RegionColor[colorID]);
++
++		glVertex3f((float)v1[AXIS_X], (float)v1[AXIS_Y], (float)v1[AXIS_Z]);
++		//glColor3f(m_RegionColor[1][0], m_RegionColor[1][1], m_RegionColor[1][2]);
++		//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[1]);
++		//glColor3f(0.0, 0.0, 1.0);
++		glVertex3f((float)v2[AXIS_X], (float)v2[AXIS_Y], (float)v2[AXIS_Z]);
++		//glColor3f(m_RegionColor[2][0], m_RegionColor[2][1], m_RegionColor[2][2]);
++		//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[2]);
++		//glColor3f(0.0, 1.0, 0.0);
++		glVertex3f((float)v3[AXIS_X], (float)v3[AXIS_Y], (float)v3[AXIS_Z]);
++	}
++	glEnd();
++
++	glPopMatrix(); // restore the current view matrix
++
++	glDisable(GL_BLEND);
++	//glDisable(GL_LINE_SMOOTH);
++	//glDisable(GL_POLYGON_SMOOTH);
++	glShadeModel(GL_FLAT);
++}
++
++
+ void SolidSTL_Viewer::DrawModel_Shaded( SolidSTL *psolid, float m_LightPos[4] )
+ {
+ 	if(psolid == NULL) return;
+@@ -351,16 +686,16 @@ void SolidSTL_Viewer::DrawModel_Curvature( SolidSTL *psolid, float m_LightPos[4]
+ 		CVertex Norm = psolid->mTriArray[i].Normal();
+ 
+ 		glNormal3f((float)Norm[AXIS_X], (float)Norm[AXIS_Y], (float)Norm[AXIS_Z]);
+-		glColor3f(1.0, 0.0, 0.0);
+-		//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[0]);
++		//glColor3f(1.0, 0.0, 0.0);
++		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[0]);
+ 		glVertex3f((float)v1[AXIS_X], (float)v1[AXIS_Y], (float)v1[AXIS_Z]);
+-		glColor3f(0.0, 0.0, 1.0);
+-		//glColor3f(m_RegionColor[1][0], m_RegionColor[1][1], m_RegionColor[1][2]);
+-		//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[1]);
++		//glColor3f(0.0, 0.0, 1.0);
++		glColor3f(m_RegionColor[1][0], m_RegionColor[1][1], m_RegionColor[1][2]);
++		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[1]);
+ 		glVertex3f((float)v2[AXIS_X], (float)v2[AXIS_Y], (float)v2[AXIS_Z]);
+-		glColor3f(0.0, 1.0, 0.0);
+-		//glColor3f(m_RegionColor[2][0], m_RegionColor[2][1], m_RegionColor[2][2]);
+-		//glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[2]);
++		//glColor3f(0.0, 1.0, 0.0);
++		glColor3f(m_RegionColor[2][0], m_RegionColor[2][1], m_RegionColor[2][2]);
++		glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, m_RegionColor[2]);
+ 		glVertex3f((float)v3[AXIS_X], (float)v3[AXIS_Y], (float)v3[AXIS_Z]);
+ 	}	
+ 	glEnd();
+diff --git a/MeshTestbed/C++/SolidSTL_Viewer.h b/MeshTestbed/C++/SolidSTL_Viewer.h
+index b99a038..b5a7a46 100644
+--- a/MeshTestbed/C++/SolidSTL_Viewer.h
++++ b/MeshTestbed/C++/SolidSTL_Viewer.h
+@@ -19,6 +19,7 @@ public:
+ 	void DrawModel_Points( SolidSTL *psolid, int ViewSkipVert );
+ 	void DrawModel_Shaded( SolidSTL *psolid, float m_LightPos[4] );
+ 	void DrawModel_Extent( SolidSTL *psolid );
++	void DrawModel_ColorSTL(SolidSTL *psolid, float m_LightPos[4]);
+ 	void DrawModel_WireFrameShaded( SolidSTL *psolid, float m_LightPos[4] );
+ 	void DrawModel_Curvature( SolidSTL *psolid, float m_LightPos[4] );	
+ 
+@@ -27,12 +28,20 @@ public:
+ 	void SetLightPos(float aLP[4]);
+ 	void SetPartColor(float aPC[4]);
+ 
++	bool Build_CTL_Color(SolidSTL* mp_solid);
++	bool Build_CTL_Color_Logic2(SolidSTL* mp_solid);
++	bool Build_CTL_Color_Logic3(SolidSTL* mp_solid);
++
+ protected:
+ 	void SetModelTransform( SolidSTL *psolid );
+ 
+ public:
+ 	// Display attribute
+ 	static float m_PartColor[4];
++	static float m_PartColorRed[4];
++	static float m_PartColorGreen[4];
++	static float m_PartColorBlue[4];
++	static float m_RegionColor[3][4];
+ 	static float m_AmbientLight[4];
+ 	static float m_DiffuseLight[4];
+ };
+diff --git a/MeshTestbed/C++/Triangle.cpp b/MeshTestbed/C++/Triangle.cpp
+index 7260139..d69fab6 100644
+--- a/MeshTestbed/C++/Triangle.cpp
++++ b/MeshTestbed/C++/Triangle.cpp
+@@ -34,7 +34,12 @@ CTriangle::CTriangle(const CTriangle &rhs)
+ 	m_vert[1] = rhs.m_vert[1];
+ 	m_vert[2] = rhs.m_vert[2];
+ 	m_Normal = rhs.m_Normal;
++	m_Centroid = rhs.m_Centroid;
+ 	m_Area = rhs.m_Area;
++	m_Slope = rhs.m_Slope;
++	m_ColorID = rhs.m_ColorID;
++	m_Min_SliceID = rhs.m_Min_SliceID;
++	m_Max_SliceID = rhs.m_Max_SliceID;
+ }
+ 
+ CTriangle::CTriangle(const CVertex &p0, const CVertex &p1, const CVertex &p2)
+@@ -44,6 +49,7 @@ CTriangle::CTriangle(const CVertex &p0, const CVertex &p1, const CVertex &p2)
+ 	m_vert[2] = p2;
+ 	ComputeNormal();
+ 	CalcArea();
++	CalcSlope();
+ }      
+ 
+ CTriangle::CTriangle(const float x0, const float y0, const float z0,
+@@ -55,6 +61,7 @@ CTriangle::CTriangle(const float x0, const float y0, const float z0,
+ 	m_vert[2][0] = x2;	m_vert[2][1] = y2;	m_vert[2][2] = z2;
+ 	ComputeNormal();
+ 	CalcArea();
++	CalcSlope();
+ }
+ 	
+ CTriangle::CTriangle(const double x0, const double y0, const double z0,
+@@ -66,6 +73,7 @@ CTriangle::CTriangle(const double x0, const double y0, const double z0,
+ 	m_vert[2][0] = x2;	m_vert[2][1] = y2;	m_vert[2][2] = z2;
+ 	ComputeNormal();
+ 	CalcArea();
++	CalcSlope();
+ }
+ 
+ CTriangle& CTriangle::operator =(const CTriangle &rhs)
+@@ -81,7 +89,12 @@ CTriangle& CTriangle::operator =(const CTriangle &rhs)
+ 	m_vert[2][1] = rhs.m_vert[2][1];
+ 	m_vert[2][2] = rhs.m_vert[2][2];
+ 	m_Normal = rhs.m_Normal;
++	m_Centroid = rhs.m_Centroid;
+ 	m_Area = rhs.m_Area;
++	m_Slope = rhs.m_Slope;
++	m_ColorID = rhs.m_ColorID;
++	m_Min_SliceID = rhs.m_Min_SliceID;
++	m_Max_SliceID = rhs.m_Max_SliceID;
+ 	return *this;
+ }
+ 
+@@ -103,11 +116,6 @@ int CTriangle::ReadTriangle(CSolidSTL *pstl, int iIndex)
+ 	return -1;
+ }
+ 
+-void CTriangle::SetNormal(CVertex &aN)
+-{
+-	m_Normal = aN;
+-}
+-
+ CVertex CTriangle::ComputeNormal()
+ {
+ 	CVertex p1, p2, f;
+@@ -140,6 +148,30 @@ CVertex CTriangle::ComputeNormal()
+ 	return f;
+ }
+ 
++CVertex CTriangle::ComputeCentroid()
++{
++	CVertex &v1= m_vert[0];
++	CVertex &v2= m_vert[1];
++	CVertex &v3= m_vert[2];
++
++	m_Centroid = (m_vert[0] + m_vert[1] + m_vert[2]) / 3.0;
++
++	/*
++	char str[256];
++	sprintf_s(str, "Vertex 1 (x, y, z): (%lf, %lf, %lf)\n", v1.getVec()[0], v1.getVec()[1], v1.getVec()[2]);
++	OutputDebugString(str);
++	sprintf_s(str, "Vertex 2 (x, y, z): (%lf, %lf, %lf)\n", v2.getVec()[0], v2.getVec()[1], v2.getVec()[2]);
++	OutputDebugString(str);
++	sprintf_s(str, "Vertex 3 (x, y, z): (%lf, %lf, %lf)\n", v3.getVec()[0], v3.getVec()[1], v3.getVec()[2]);
++	OutputDebugString(str);
++	sprintf_s(str, "Centroid (x, y, z): (%lf, %lf, %lf)\n", m_Centroid.getVec()[0], m_Centroid.getVec()[1], m_Centroid.getVec()[2]);
++	OutputDebugString(str);
++	*/
++
++
++	return m_Centroid;
++}
++
+ double CTriangle::CalcArea()
+ {
+ 	CVertex &v1= m_vert[0];
+@@ -211,6 +243,25 @@ double CTriangle::CalcArea()
+ 	//}
+ 	return m_Area;
+ }
++
++double CTriangle::CalcSlope()
++{
++	// Getting reference surface normal vector
++	CVertex m_Ref_Surface_Norm = CVertex(0.0, 0.0, 1.0);
++	// Get angle between m_Norm and m_Ref_Surface_Norm
++	double m_Norm_Dot_m_Ref = m_Normal.dot(m_Ref_Surface_Norm);
++	double angle = acos(m_Norm_Dot_m_Ref);
++
++	if (abs(angle - M_PI / 2.0) < 1e-06) {
++		m_Slope = INFINITY;
++		return INFINITY;
++	}
++	else {
++		double slope = tan(angle);
++		m_Slope = slope;
++		return slope;
++	}
++}
+     
+ CTriangle CTriangle::GetReverseTri()
+ {
+@@ -540,19 +591,25 @@ int CTriangle::Read_BinarySTLFile(CString &STLFileName, CTriangle *&pArray_Tri)
+ CTriangleID::CTriangleID(void)
+ {	
+ 	mTag = 0;
+-	mColorID = -1;
++	m_ColorID = -1;
++	m_Min_SliceID = -1;
++	m_Max_SliceID = -1;
+ 	m_ShellNum = -1;
+ }
+ 
+ CTriangleID::CTriangleID(const CTriangleID &rhs)
+ {
+ 	mTag = rhs.mTag;
+-	mColorID = rhs.mColorID;
++	m_ColorID = rhs.m_ColorID;
++	m_Min_SliceID = rhs.m_Min_SliceID;
++	m_Max_SliceID = rhs.m_Max_SliceID;
+ 	m_vert[0] = rhs.m_vert[0];
+ 	m_vert[1] = rhs.m_vert[1];
+ 	m_vert[2] = rhs.m_vert[2];
+ 	m_Normal = rhs.m_Normal;
++	m_Centroid = rhs.m_Centroid;
+ 	m_Area = rhs.m_Area;
++	m_Slope = rhs.m_Slope;
+ 	m_ShellNum = rhs.m_ShellNum;
+ }
+ 
+@@ -562,19 +619,25 @@ CTriangleID::CTriangleID(const int p0,const int p1,  const int p2)
+ 	m_vert[1] = p1;
+ 	m_vert[2] = p2;
+ 	mTag = 0;
+-	mColorID = -1;
++	m_ColorID = -1;
++	m_Min_SliceID = -1;
++	m_Max_SliceID = -1;
+ 	m_ShellNum = -1;
+ }      
+ 
+ CTriangleID& CTriangleID::operator =(const CTriangleID &rhs)
+ {
+ 	mTag = rhs.mTag;
+-	mColorID = rhs.mColorID;
++	m_ColorID = rhs.m_ColorID;
++	m_Min_SliceID = rhs.m_Min_SliceID;
++	m_Max_SliceID = rhs.m_Max_SliceID;
+ 	m_vert[0] = rhs.m_vert[0];
+ 	m_vert[1] = rhs.m_vert[1];
+ 	m_vert[2] = rhs.m_vert[2];
+ 	m_Normal = rhs.m_Normal;
++	m_Centroid = rhs.m_Centroid;
+ 	m_Area = rhs.m_Area;
++	m_Slope = rhs.m_Slope;
+ 	m_ShellNum = rhs.m_ShellNum;
+ 	return *this;
+ }
+@@ -584,8 +647,3 @@ int CTriangleID::operator [](int i)
+ 	return m_vert[i];
+ }
+ 
+-void CTriangleID::SetNormal(CVertex &aN)
+-{
+-	m_Normal = aN;
+-}
+-
+diff --git a/MeshTestbed/C++/Triangle.h b/MeshTestbed/C++/Triangle.h
+index e087d30..602de40 100644
+--- a/MeshTestbed/C++/Triangle.h
++++ b/MeshTestbed/C++/Triangle.h
+@@ -19,9 +19,12 @@ protected:
+ 	int mTag;
+ 	CVertex m_vert[3];
+ 	CVertex m_Normal;
++	CVertex m_Centroid;
+ 	double m_Area;
+ 	double m_Slope;
+-	int m_Color;
++	int m_ColorID;
++	int m_Min_SliceID;
++	int m_Max_SliceID;
+ public:
+ 	CTriangle(void);
+ 	CTriangle(const CTriangle &rhs);
+@@ -39,14 +42,28 @@ public:
+ 	void SetTag(int atag) {	mTag = atag;	}
+ 	int tag() {	return mTag;	}
+ 
+-	void SetNormal(CVertex &aN);
+ 	CVertex &Normal() {		return m_Normal;	}
++	CVertex	&Centroid() {	return m_Centroid;	}
++	int ColorID() { return m_ColorID;  }
++	int MinSliceID() { return m_Min_SliceID;  }
++	int MaxSliceID() { return m_Max_SliceID;  }
++
++	void SetNormal(CVertex &aN) { m_Normal = aN; }
++	void SetCentroid(CVertex &aN) { m_Centroid = aN; }
++	void SetMinSliceID(int sID) { m_Min_SliceID = sID;  }
++	void SetMaxSliceID(int sID) { m_Max_SliceID = sID;  }
++	void SetColorID(int cID) { m_ColorID = cID;  }
++
+ 	CVertex ComputeNormal();
++	CVertex ComputeCentroid();
+ 
+ 	void SetArea(double aA)	{ m_Area = aA;	}
+ 	double Area() {		return m_Area;	}
++	double Slope() {	return m_Slope;	}
+ 	double CalcArea();
+ 
++	double CalcSlope();
++
+ 	CTriangle GetReverseTri(); // same postion with reverse normal
+ 	int ReadTriangle(CSolidSTL *pStl, int iIndex);
+ 
+@@ -62,11 +79,15 @@ class CTriangleID
+ protected:
+ 	int m_vert[3];
+ 	CVertex m_Normal;
++	CVertex m_Centroid;
++	int m_Min_SliceID;
++	int m_Max_SliceID;
++	int m_ColorID;
+ 	double m_Area;
++	double m_Slope;
+ 	int m_ShellNum;
+ 
+ 	int mTag;
+-	int mColorID;
+ public:
+ 	CTriangleID(void);
+ 	CTriangleID(const CTriangleID &rhs);
+@@ -75,17 +96,24 @@ public:
+ 	CTriangleID & operator =(const CTriangleID &rhs);
+ 	
+ 	int operator [](int i);
+-	CVertex Normal() {	return m_Normal; }
++	CVertex &Normal() {	return m_Normal; }
++	CVertex &Centroid() {	return m_Centroid; }
++	int MinSliceID() { return m_Min_SliceID;  }
++	int MaxSliceID() { return m_Max_SliceID;  }
++	int ColorID() { return m_ColorID;  }
+ 	double Area() {	return m_Area; }
+ 	int Shell() {	return m_ShellNum; }
+ 
+ 	void SetVertex(int Index, int aValue)	{	m_vert[Index] = aValue;	}
+-	void SetNormal(CVertex &aN);
++	void SetNormal(CVertex &aN) { m_Normal = aN;  };
++	void SetCentroid(CVertex &aN) { m_Centroid = aN;  };
++	void SetMinSliceID(int sID) { m_Min_SliceID = sID;  }
++	void SetMaxSliceID(int sID) { m_Max_SliceID = sID;  }
++	void SetColorID(int cID) {	m_ColorID = cID;	}
+ 	void SetArea(double aA)	{ m_Area = aA;	}
++	void SetSlope(double aS)	{ m_Slope = aS;	}
+ 	void SetShellNum(int aShell)	{ m_ShellNum = aShell;	}
+ 	void SetTag(int atag) {	mTag = atag;	}
+-	void SetColorID(int aID) {	mColorID = aID;	}
+ 
+ 	int tag() {	return mTag;	}
+-	int colorID() {	return mColorID;	}
+ };
