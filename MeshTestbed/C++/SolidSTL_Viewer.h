@@ -30,6 +30,7 @@ public:
 
 	bool Build_CTL_Color(SolidSTL* mp_solid);
 	bool Build_CTL_Color_Logic2(SolidSTL* mp_solid);
+	bool Build_CTL_Color_Logic3(SolidSTL* mp_solid);
 
 protected:
 	void SetModelTransform( SolidSTL *psolid );
