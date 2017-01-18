@@ -66,8 +66,8 @@ public:
 	~SolidSTL_Builder(void);
 
 	// build complete information for SolidSTL
-	bool Construct(CString &STLFileName, SolidSTL *ap_Solid, bool bSolidSTL, CProgressCtrl *aProgressCtrl=NULL);
-	bool Construct(int TriNum, CTriangle *pArray_Tri, SolidSTL *ap_Solid, CProgressCtrl *aProgressCtrl=NULL);
+	bool Construct(CString &STLFileName, SolidSTL *ap_Solid, bool bSolidSTL, CProgressCtrl *aProgressCtrl=NULL, CDemoInfo *aDemoInfo=NULL);
+	bool Construct(int TriNum, CTriangle *pArray_Tri, SolidSTL *ap_Solid, CProgressCtrl *aProgressCtrl=NULL, CDemoInfo *aDemoInfo=NULL);
 
 protected:
 	// step 1

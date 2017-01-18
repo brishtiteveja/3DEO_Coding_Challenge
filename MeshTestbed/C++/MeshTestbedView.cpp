@@ -145,6 +145,10 @@ void CMeshTestbedView::DrawScene(void)
 	{
 		if(pdoc->mPart[i] != NULL)
 		{
+			double elapsed_time;
+			clock_t start;
+			char str[256];
+
 			switch(m_ViewMethod)
 			{
 			case Points:
@@ -166,7 +170,11 @@ void CMeshTestbedView::DrawScene(void)
 				m_stlViewer->DrawModel_Extent( pdoc->mPart[i] );
 				break;
 			case ColorSTL:
-				m_stlViewer->DrawModel_ColorSTL(pdoc->mPart[i], m_LightPos);
+				start = clock();
+				m_stlViewer->DrawModel_ColorSTL( pdoc->mPart[i], m_LightPos );
+				elapsed_time = (clock() - start) / (double)(CLOCKS_PER_SEC / 1000.0);
+
+				pdoc->mPart[i]->aDemoInfo->updateTime(elapsed_time);
 				break;
 			default:
 				// do nothing

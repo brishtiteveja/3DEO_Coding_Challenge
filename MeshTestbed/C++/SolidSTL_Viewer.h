@@ -28,6 +28,9 @@ public:
 	void SetLightPos(float aLP[4]);
 	void SetPartColor(float aPC[4]);
 
+	bool Build_CTL_Color(SolidSTL* mp_solid);
+	bool Build_CTL_Color_Logic2(SolidSTL* mp_solid);
+
 protected:
 	void SetModelTransform( SolidSTL *psolid );
 
@@ -40,6 +43,5 @@ public:
 	static float m_RegionColor[3][4];
 	static float m_AmbientLight[4];
 	static float m_DiffuseLight[4];
-	int SLICE_THICKNESS_PARAM;
 };
 

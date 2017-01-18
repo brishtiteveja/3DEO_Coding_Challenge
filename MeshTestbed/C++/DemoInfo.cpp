@@ -25,6 +25,7 @@ CDemoInfo::CDemoInfo(CWnd* pParent /*=NULL*/)
 	: CDialogBar()
 	, bCheck1(true)
 	, bCheck2(true)
+	, mTime(0)
 {
 	//{{AFX_DATA_INIT(CDemoInfo)
 	mEditVertNum = 0.0;
@@ -39,6 +40,7 @@ CDemoInfo::CDemoInfo(CWnd* pParent /*=NULL*/)
 
 void CDemoInfo::DoDataExchange(CDataExchange* pDX)
 {
+	aPdx = pDX;
 	CDialogBar::DoDataExchange(pDX);
 	BOOL temCheck1 = bCheck1;
 	BOOL temCheck2 = bCheck2;
@@ -50,6 +52,7 @@ void CDemoInfo::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EDIT_EXTX, mEditExtX);
 	DDX_Text(pDX, IDC_EDIT_EXTY, mEditExtY);
 	DDX_Text(pDX, IDC_EDIT_EXTZ, mEditExtZ);
+	DDX_Text(pDX, IDC_EDIT3, mTime);
 	DDX_Check(pDX, IDC_CHECK1, temCheck1);
     DDX_Check(pDX, IDC_CHECK2, temCheck2);
 	//}}AFX_DATA_MAP
@@ -120,4 +123,11 @@ void CDemoInfo::OnBnClickedCheck1()
 void CDemoInfo::OnBnClickedCheck2()
 {
 	bCheck2 = !bCheck2;
+}
+
+void CDemoInfo::updateTime(double Time) {
+	mTime = Time;
+	char str[256];
+	sprintf(str, "%.2lf", mTime);
+	SetDlgItemText(IDC_EDIT3, str);
 }

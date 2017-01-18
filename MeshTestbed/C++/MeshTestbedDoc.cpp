@@ -156,7 +156,7 @@ void CMeshTestbedDoc::OpenSTL(int aPartNum)
 		InputSTLFileName =  Fdlg.GetPathName();	
 		if(mPart[aPartNum] != NULL) delete mPart[aPartNum];
 		mPart[aPartNum] = new SolidSTL(InputSTLFileName);
-		mPart[aPartNum]->Build(false, pFrame->m_wndProgressCtrl);
+		mPart[aPartNum]->Build(false, pFrame->m_wndProgressCtrl, pFrame->m_wndDemoInfoBar);
 
 		pFrame->m_wndDemoInfoBar->UpdateData(FALSE);
 

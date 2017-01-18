@@ -25,6 +25,7 @@ class CDemoInfo : public CDialogBar
 // Construction
 public:
 	CDemoInfo(CWnd* pParent = NULL);   // standard constructor
+	CDataExchange* aPdx;
 
 // Dialog Data
 	//{{AFX_DATA(CDemoInfo)
@@ -39,7 +40,6 @@ public:
 
 	bool bCheck1;
 	bool bCheck2;
-
 
 protected:
 	// Overrides
@@ -61,10 +61,13 @@ public:
 	void GetEditHandleNumValue(double &EditHandleNumValue);
 	void GetEditExtValues(double *PartExt);
 
+	void updateTime(double Time);
+
 	afx_msg void OnBnClickedCheck1();
 	afx_msg void OnBnClickedCheck2();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
+	double mTime;
 };
 
 //{{AFX_INSERT_LOCATION}}

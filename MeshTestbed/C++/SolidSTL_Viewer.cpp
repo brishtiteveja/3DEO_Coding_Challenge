@@ -257,9 +257,138 @@ void SolidSTL_Viewer::DrawModel_WireFrameShaded( SolidSTL *psolid, float m_Light
 	glPopMatrix(); // restore the current view matrix
 }
 
+bool SolidSTL_Viewer::Build_CTL_Color(SolidSTL* mp_solid) {
+	for (int i = 0; i < mp_solid->mTri_Num; i++)
+	{
+		// Determining slope color
+		CVertex Norm = mp_solid->mTriArray[i].Normal();
+		double Norm_z = Norm.getVec()[2];
+
+		// Current triangle slope and determine its color
+		int colorID;
+		if (Norm_z > 0) { // Up slope  ,   Red Color
+			colorID = 0;
+		}
+		else if (Norm_z < 0) { // Down slope   ,  Green Color
+			colorID = 1;
+		}
+		else {  // Vertical    ,   Blue Color
+			colorID = 2;
+		}
+
+		mp_solid->mTriArray[i].SetColorID(colorID);
+	}
+
+	return true;
+}
+
+bool SolidSTL_Viewer::Build_CTL_Color_Logic2(SolidSTL* mp_solid) {
+	//determining slice no
+	double minZ = INFINITY;
+	double maxZ = -INFINITY;
+	for (int i = 0; i < mp_solid->mTri_Num; i++)
+	{
+		CVertex v1 = mp_solid->mVertArray[mp_solid->mTriArray[i][0]].Position();
+		CVertex v2 = mp_solid->mVertArray[mp_solid->mTriArray[i][1]].Position();
+		CVertex v3 = mp_solid->mVertArray[mp_solid->mTriArray[i][2]].Position();
+
+		// Getting slice ID for each vertex of the triangle
+		double v1Z = v1.getVec()[2];
+		double v2Z = v2.getVec()[2];
+		double v3Z = v3.getVec()[2];
+
+		int sliceID1 = (int)((v1Z - minZ) / SLICE_THICKNESS);
+		int sliceID2 = (int)((v2Z - minZ) / SLICE_THICKNESS);
+		int sliceID3 = (int)((v3Z - minZ) / SLICE_THICKNESS);
+		int minSliceID = min(sliceID1, min(sliceID2, sliceID3));
+		int maxSliceID = max(sliceID1, max(sliceID2, sliceID3));
+
+		mp_solid->mTriArray[i].SetMinSliceID(minSliceID); // Lowest slice that includes the triangle
+		mp_solid->mTriArray[i].SetMaxSliceID(maxSliceID); // Highest slice that includes the triangle
+
+		double minZT = min(v1Z, min(v2Z, v3Z));
+		double maxZT = max(v1Z, max(v2Z, v3Z));
+
+		if (maxZT > maxZ)
+			maxZ = maxZT;
+		if (minZT < minZ)
+			minZ = minZT;
+	}
+
+	// Determining number of slices
+	int MAX_SLICE_NO = (int)((maxZ - minZ) / SLICE_THICKNESS);
+
+	char str[256];
+	//sprintf(str, "max slice no = %d \n", MAX_SLICE_NO);
+	//OutputDebugString(str);
+
+	// storage for slice color
+	int *mSliceColorID = new int[MAX_SLICE_NO]; 
+	fill_n(mSliceColorID, MAX_SLICE_NO, -1);  // initialize slice color id
+
+	for (int i = 0; i < mp_solid->mTri_Num; i++)
+	{
+		int minSliceID = mp_solid->mTriArray[i].MinSliceID();
+		int maxSliceID = mp_solid->mTriArray[i].MaxSliceID();
+
+		//sprintf(str, "s1 = %d, s2 = %d, s3 = %d, mins = %d, maxs = %d \n", sliceID1, sliceID2, sliceID3, minSliceID, maxSliceID);
+		//OutputDebugString(str);
+
+		// Determining slope color
+		CVertex Norm = mp_solid->mTriArray[i].Normal();
+		double Norm_z = Norm.getVec()[2];
+
+		// Current triangle slope and determine its color
+		int colorID;
+		if (Norm_z > 0) { // Up slope  ,   Red Color
+			colorID = 0;
+		}
+		else if (Norm_z < 0) { // Down slope   ,  Green Color
+			colorID = 1;
+		}
+		else {  // Vertical    ,   Blue Color
+			colorID = 2;
+		}
+
+		// setting color id for all slices in between the triangle
+		// Check whether other slices are already colored
+		// Checking slice color and updating with priority DOWN > UP > 2.5D
+		int sliceColorID = mSliceColorID[0];
+		for (int k = minSliceID; k < maxSliceID; k++) {
+			if (sliceColorID == 1 || colorID == 1) {    // triangle in downslope, if any triangle has downslope in the slice, all triangle will have downslope
+				sliceColorID = colorID = 1;
+				mSliceColorID[k] = 1;
+			}
+			else if (sliceColorID == 0 || colorID == 0) { // if this triangle or any any other triangle in the slice in up slope
+				sliceColorID = colorID = 0;
+				mSliceColorID[k] = 0;
+			}
+			else if (sliceColorID == 2 || colorID == 2) {// Vertical
+				sliceColorID = colorID = 2;
+				mSliceColorID[k] = 2;
+			}
+			else {	// slice not yet colored
+				sliceColorID = colorID;
+				mSliceColorID[k] = colorID;
+			}
+		}
+		
+		mp_solid->mTriArray[i].SetColorID(sliceColorID);
+
+	}
+
+	return true;
+}
+
+
 void SolidSTL_Viewer::DrawModel_ColorSTL(SolidSTL *psolid, float m_LightPos[4])
 {
 	if (psolid == NULL) return;
+	if (psolid->ColorBuilt() == false) {
+		Build_CTL_Color(psolid);
+		psolid->SetColorBuilt(true);
+	}
+
 
 	// first combine the transformation of SolidSTL
 	glMatrixMode(GL_MODELVIEW);
@@ -299,93 +428,6 @@ void SolidSTL_Viewer::DrawModel_ColorSTL(SolidSTL *psolid, float m_LightPos[4])
 
 	glBegin(GL_TRIANGLES);
 
-
-	//determining slice no
-	double min = INFINITY;
-	double max = -INFINITY;
-	for (int i = 0; i < psolid->mTri_Num; i++)
-	{
-		CVertex Centroid = psolid->mTriArray[i].Centroid();
-		double triZ = Centroid.getVec()[2];
-
-		if (triZ > max)
-			max = triZ;
-		if (triZ < min)
-			min = triZ;
-	}
-
-	double SLICE_THICKNESS = (max - min) / 1000000;
-	int MAX_SLICE_NO = (int)(max / SLICE_THICKNESS);
-
-	float mSliceColor[4];
-	char str[256];
-	
-	int *mSliceColorID = new int[MAX_SLICE_NO]; 
-	fill_n(mSliceColorID, MAX_SLICE_NO, -1);  // initialize slice color id
-
-	for (int i = 0; i < psolid->mTri_Num; i++)
-	{
-		CVertex v1 = psolid->mVertArray[psolid->mTriArray[i][0]].Position();
-		CVertex v2 = psolid->mVertArray[psolid->mTriArray[i][1]].Position();
-		CVertex v3 = psolid->mVertArray[psolid->mTriArray[i][2]].Position();
-		//v1.getVec()[3]
-		CVertex Norm = psolid->mTriArray[i].Normal();
-
-		CVertex Centroid = psolid->mTriArray[i].Centroid();
-		double triZ = Centroid.getVec()[2];
-		int sliceID = (int)(triZ / SLICE_THICKNESS);
-
-		double v1_z = v1.getVec()[2];
-		double v2_z = v2.getVec()[2];
-		double v3_z = v3.getVec()[2];
-
-		int sliceID1 = (int)(v1_z / SLICE_THICKNESS);
-		int sliceID2 = (int)(v2_z / SLICE_THICKNESS);
-		int sliceID3 = (int)(v3_z / SLICE_THICKNESS);
-
-		sliceID = (sliceID1 + sliceID2 + sliceID3) / 3 ;
-	
-		sprintf_s(str, "sid1 = %d sid2 = %d sid3 = %d sid = %d \n", sliceID1, sliceID2, sliceID3, sliceID);
-		OutputDebugString(str);
-
-		psolid->mTriArray[i].SetSliceID(sliceID);
-
-		double Norm_z = Norm.getVec()[2];
-
-		int colorID;
-		if (Norm_z > 0) { // Up slope  ,   Red Color
-			colorID = 0;
-			//sprintf_s(str, "Tri_z = %lf \n slice#= %d \n Norm_z = %lf \n Green Color \n \n", triZ, sliceID, Norm_z);
-			//OutputDebugString(str);
-		}
-		else if (Norm_z < 0) { // Down slope   ,  Green Color
-			colorID = 1;
-			//sprintf_s(str, "Tri_z = %lf \n slice#= %d \n Norm_z = %lf \n Red Color \n \n", triZ, sliceID, Norm_z);
-			//OutputDebugString(str);
-		}
-		else {  // Vertical    ,   Blue Color
-			colorID = 2;
-			//sprintf_s(str, "Tri_z = %lf \n slice#= %d \n Norm_z = %lf \n Blue Color \n \n", triZ, sliceID, Norm_z);
-			//OutputDebugString(str);
-		}
-
-		psolid->mTriArray[i].SetColorID(colorID);
-		/*
-		int sliceColorID = mSliceColorID[sliceID];
-		if (sliceColorID != -1) {
-			mSliceColorID[sliceID] = sliceColorID = colorID;
-			psolid->mTriArray[i].SetColorID(colorID);
-		}
-		else {
-			if (sliceColorID == 1 || colorID == 1)    // triangle in downslope, if any triangle has downslope in the slice, all triangle will have downslope
-				psolid->mTriArray[i].SetColorID(1);
-			else if (sliceColorID == 0 || colorID == 0) // triangle in up slope
-				psolid->mTriArray[i].SetColorID(0);
-			else
-				psolid->mTriArray[i].SetColorID(0); // triangle in 2.5 D
-		}
-		*/
-	}
 
 	for (int i = 0; i<psolid->mTri_Num; i++)
 	{

@@ -38,7 +38,8 @@ CTriangle::CTriangle(const CTriangle &rhs)
 	m_Area = rhs.m_Area;
 	m_Slope = rhs.m_Slope;
 	m_ColorID = rhs.m_ColorID;
-	m_SliceID = rhs.m_SliceID;
+	m_Min_SliceID = rhs.m_Min_SliceID;
+	m_Max_SliceID = rhs.m_Max_SliceID;
 }
 
 CTriangle::CTriangle(const CVertex &p0, const CVertex &p1, const CVertex &p2)
@@ -92,7 +93,8 @@ CTriangle& CTriangle::operator =(const CTriangle &rhs)
 	m_Area = rhs.m_Area;
 	m_Slope = rhs.m_Slope;
 	m_ColorID = rhs.m_ColorID;
-	m_SliceID = rhs.m_SliceID;
+	m_Min_SliceID = rhs.m_Min_SliceID;
+	m_Max_SliceID = rhs.m_Max_SliceID;
 	return *this;
 }
 
@@ -590,7 +592,8 @@ CTriangleID::CTriangleID(void)
 {	
 	mTag = 0;
 	m_ColorID = -1;
-	m_SliceID = -1;
+	m_Min_SliceID = -1;
+	m_Max_SliceID = -1;
 	m_ShellNum = -1;
 }
 
@@ -598,7 +601,8 @@ CTriangleID::CTriangleID(const CTriangleID &rhs)
 {
 	mTag = rhs.mTag;
 	m_ColorID = rhs.m_ColorID;
-	m_SliceID = rhs.m_SliceID;
+	m_Min_SliceID = rhs.m_Min_SliceID;
+	m_Max_SliceID = rhs.m_Max_SliceID;
 	m_vert[0] = rhs.m_vert[0];
 	m_vert[1] = rhs.m_vert[1];
 	m_vert[2] = rhs.m_vert[2];
@@ -616,7 +620,8 @@ CTriangleID::CTriangleID(const int p0,const int p1,  const int p2)
 	m_vert[2] = p2;
 	mTag = 0;
 	m_ColorID = -1;
-	m_SliceID = -1;
+	m_Min_SliceID = -1;
+	m_Max_SliceID = -1;
 	m_ShellNum = -1;
 }      
 
@@ -624,7 +629,8 @@ CTriangleID& CTriangleID::operator =(const CTriangleID &rhs)
 {
 	mTag = rhs.mTag;
 	m_ColorID = rhs.m_ColorID;
-	m_SliceID = rhs.m_SliceID;
+	m_Min_SliceID = rhs.m_Min_SliceID;
+	m_Max_SliceID = rhs.m_Max_SliceID;
 	m_vert[0] = rhs.m_vert[0];
 	m_vert[1] = rhs.m_vert[1];
 	m_vert[2] = rhs.m_vert[2];

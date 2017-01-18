@@ -262,7 +262,7 @@ SolidSTL_Builder::~SolidSTL_Builder(void)
 
 // return the data related to the STL file
 bool SolidSTL_Builder::Construct(CString &STLFileName, SolidSTL *ap_solid, 
-								 bool bSolidSTL, CProgressCtrl *aProgressCtrl)
+								 bool bSolidSTL, CProgressCtrl *aProgressCtrl, CDemoInfo *aDemoInfo)
 {
 	if(ap_solid == NULL) return false;
 	mp_solid = ap_solid;
@@ -271,7 +271,8 @@ bool SolidSTL_Builder::Construct(CString &STLFileName, SolidSTL *ap_solid,
 	CTriangle *pArray_Tri=NULL;		// temporary triangle table to store STL
 	if(Read_STL_File(STLFileName, pArray_Tri) <= 0) return false;
 	if(aProgressCtrl!=NULL) aProgressCtrl->SetPos(30);
-	
+	ap_solid->aDemoInfo = aDemoInfo;
+
 	// check and delete non-regular triangles
 	if( bSolidSTL ) 
 		mp_solid->mTri_Num = RegulateTriangles(mp_solid->mTri_Num, pArray_Tri);
@@ -291,6 +292,9 @@ bool SolidSTL_Builder::Construct(CString &STLFileName, SolidSTL *ap_solid,
 		mp_solid->mVertArray[i].SetPosition(VertArray[i]);
 	mp_solid->CalcExtents();	// get the bounding box
 	VertArray.RemoveAll();	// no use any more
+
+	// Step *2: Determine slice and slice color and set triangle color id
+	//if(Build_CTL_Color_Logic2() != true) return false;
 
 	// Step 3: Build half-edge table
 	if(Build_Topology() == true) // topology of STL is good 
@@ -322,7 +326,7 @@ bool SolidSTL_Builder::Construct(CString &STLFileName, SolidSTL *ap_solid,
 
 // return the data related to the STL file
 bool SolidSTL_Builder::Construct(int TriNum, CTriangle *pArray_Tri,
-								 SolidSTL *ap_solid, CProgressCtrl *aProgressCtrl)
+								 SolidSTL *ap_solid, CProgressCtrl *aProgressCtrl, CDemoInfo *aDemoInfo)
 {
 	if(ap_solid == NULL) return false;
 	mp_solid = ap_solid;
@@ -604,51 +608,42 @@ bool SolidSTL_Builder::Build_Topology()
 }
 
 // from a CTriangle array, generate a CVertex Array and a CTriangleID array
-bool SolidSTL_Builder::Build_CTL(CTriangle *&pArray_Tri, 
-								 CArray <CVertex, CVertex&> &VertArray, 
-								 CTriangleID *pTriIDArray)
+bool SolidSTL_Builder::Build_CTL(CTriangle *&pArray_Tri,
+	CArray <CVertex, CVertex&> &VertArray,
+	CTriangleID *pTriIDArray)
 {
 	// get the vertices table
-	int vert_Num = 3*mp_solid->mTri_Num;
+	int vert_Num = 3 * mp_solid->mTri_Num;
 	CSortVertex *tempArray_vertices = new CSortVertex[vert_Num];
-	for(int i=0; i < mp_solid->mTri_Num;i++)
+	for (int i = 0; i < mp_solid->mTri_Num; i++)
 	{
 		CTriangle curT = pArray_Tri[i];
 		CSortVertex sv1(curT[0], i, 0);
-		tempArray_vertices[i*3] = sv1;
+		tempArray_vertices[i * 3] = sv1;
 		CSortVertex sv2(curT[1], i, 1);
-		tempArray_vertices[i*3+1] = sv2;
+		tempArray_vertices[i * 3 + 1] = sv2;
 		CSortVertex sv3(curT[2], i, 2);
-		tempArray_vertices[i*3+2] = sv3;
+		tempArray_vertices[i * 3 + 2] = sv3;
 	}
+
 	// quick order the vertices
-	CSortVertex::quick_sort_vertex_array(tempArray_vertices, 0, vert_Num-1);
+	CSortVertex::quick_sort_vertex_array(tempArray_vertices, 0, vert_Num - 1);
 
 	// build vertices table and TriangleID table
-	for(int i=0; i < mp_solid->mTri_Num;i++)
+	for (int i = 0; i < mp_solid->mTri_Num; i++)
 	{
 		CTriangle curT = pArray_Tri[i];
 		pTriIDArray[i].SetNormal(curT.Normal());
-		/*
-		char str[256];
-		CVertex Norm = curT.Normal();
-		sprintf_s(str, "Norm (x, y, z): (%lf, %lf, %lf)\n", Norm.getVec()[0], Norm.getVec()[1], Norm.getVec()[2]);
-		OutputDebugString(str);
-		CVertex Centroid = curT.Centroid();
-		sprintf_s(str, "Centroid (x, y, z): (%lf, %lf, %lf)\n", Centroid.getVec()[0], Centroid.getVec()[1], Centroid.getVec()[2]);
-		OutputDebugString(str);
-		*/
-
 		pTriIDArray[i].SetCentroid(curT.Centroid());
 		pTriIDArray[i].SetArea(curT.Area());
 		pTriIDArray[i].SetSlope(curT.Slope());
 		pTriIDArray[i].SetTag(curT.tag());
 	}
 	int curVert_Num = -1;
-	for(int i=0;i<vert_Num;i++)
+	for (int i = 0; i < vert_Num; i++)
 	{
 		// check to add new vertex
-		if(curVert_Num < 0 || tempArray_vertices[i].m_vec != VertArray[curVert_Num])
+		if (curVert_Num < 0 || tempArray_vertices[i].m_vec != VertArray[curVert_Num])
 		{
 			VertArray.Add(tempArray_vertices[i].m_vec);
 			curVert_Num++;
@@ -658,11 +653,11 @@ bool SolidSTL_Builder::Build_CTL(CTriangle *&pArray_Tri,
 		int VNum = tempArray_vertices[i].mVertNum;
 		pTriIDArray[TriNum].SetVertex(VNum, curVert_Num);
 	}
-	
-	mp_solid->mVert_Num = curVert_Num+1;
+
+	mp_solid->mVert_Num = curVert_Num + 1;
 
 	// temp CTriangle array is not used any more, delete it here
-	delete []tempArray_vertices;
+	delete[]tempArray_vertices;
 
 	return true;
 }

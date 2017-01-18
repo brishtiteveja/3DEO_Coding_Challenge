@@ -88,6 +88,8 @@ int SolidSTL::lastDpyList = 111;	// to make sure no redundant in the display lis
 
 SolidSTL::SolidSTL(CString &aSTLFileName)
 {
+	aDemoInfo = NULL;
+	m_ColorBuilt = false;
 	m_STLFileName = aSTLFileName;
 	mVertArray = NULL;
 	mTriArray = NULL;
@@ -113,12 +115,12 @@ SolidSTL::~SolidSTL(void)
 }
 
 // call SolidCTL_Builder to complete all information from STL file
-bool SolidSTL::Build(bool bSolidSTL, CProgressCtrl *aProgressCtrl)
+bool SolidSTL::Build(bool bSolidSTL, CProgressCtrl *aProgressCtrl, CDemoInfo *aDemoInfo)
 {
 	Clean();
 	if(aProgressCtrl!=NULL) aProgressCtrl->SetPos(5);
 	SolidSTL_Builder sb;
-	if(sb.Construct(m_STLFileName, this, bSolidSTL, aProgressCtrl)==false)
+	if(sb.Construct(m_STLFileName, this, bSolidSTL, aProgressCtrl, aDemoInfo)==false)
 	{
 		AfxMessageBox("This STL is bad! Please verify and fix it first before using the system."); 
 		return false;	

@@ -23,7 +23,8 @@ protected:
 	double m_Area;
 	double m_Slope;
 	int m_ColorID;
-	int m_SliceID;
+	int m_Min_SliceID;
+	int m_Max_SliceID;
 public:
 	CTriangle(void);
 	CTriangle(const CTriangle &rhs);
@@ -44,11 +45,13 @@ public:
 	CVertex &Normal() {		return m_Normal;	}
 	CVertex	&Centroid() {	return m_Centroid;	}
 	int ColorID() { return m_ColorID;  }
-	int SliceID() { return m_SliceID;  }
+	int MinSliceID() { return m_Min_SliceID;  }
+	int MaxSliceID() { return m_Max_SliceID;  }
 
 	void SetNormal(CVertex &aN) { m_Normal = aN; }
 	void SetCentroid(CVertex &aN) { m_Centroid = aN; }
-	void SetSliceID(int sID) { m_SliceID = sID;  }
+	void SetMinSliceID(int sID) { m_Min_SliceID = sID;  }
+	void SetMaxSliceID(int sID) { m_Max_SliceID = sID;  }
 	void SetColorID(int cID) { m_ColorID = cID;  }
 
 	CVertex ComputeNormal();
@@ -77,7 +80,8 @@ protected:
 	int m_vert[3];
 	CVertex m_Normal;
 	CVertex m_Centroid;
-	int m_SliceID;
+	int m_Min_SliceID;
+	int m_Max_SliceID;
 	int m_ColorID;
 	double m_Area;
 	double m_Slope;
@@ -94,7 +98,8 @@ public:
 	int operator [](int i);
 	CVertex &Normal() {	return m_Normal; }
 	CVertex &Centroid() {	return m_Centroid; }
-	int SliceID() { return m_SliceID;  }
+	int MinSliceID() { return m_Min_SliceID;  }
+	int MaxSliceID() { return m_Max_SliceID;  }
 	int ColorID() { return m_ColorID;  }
 	double Area() {	return m_Area; }
 	int Shell() {	return m_ShellNum; }
@@ -102,7 +107,8 @@ public:
 	void SetVertex(int Index, int aValue)	{	m_vert[Index] = aValue;	}
 	void SetNormal(CVertex &aN) { m_Normal = aN;  };
 	void SetCentroid(CVertex &aN) { m_Centroid = aN;  };
-	void SetSliceID(int sID) { m_SliceID = sID;  }
+	void SetMinSliceID(int sID) { m_Min_SliceID = sID;  }
+	void SetMaxSliceID(int sID) { m_Max_SliceID = sID;  }
 	void SetColorID(int cID) {	m_ColorID = cID;	}
 	void SetArea(double aA)	{ m_Area = aA;	}
 	void SetSlope(double aS)	{ m_Slope = aS;	}

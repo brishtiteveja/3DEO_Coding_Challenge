@@ -15,6 +15,9 @@
 #include "resource.h"		// main symbols
 #include <afxtempl.h>
 #include ".\TransMatrix.h"
+#include ".\DemoInfo.h"
+
+#define SLICE_THICKNESS 0.000001
 
 enum edgeAttrib { UNKNOWN_E, CONVEX_E, FLAT_E, CONCAVE_E  };
 enum triAttrib { UNKNOWN_T, CONVEX_T, CONCAVE_T };
@@ -113,7 +116,9 @@ protected:
 	int m_endDpyList;
 	void CreateDisplayList(void);
 	void DeleteDpyLists(void);
+	bool m_ColorBuilt;
 public:
+	CDemoInfo* aDemoInfo;
 	void UpdateDisplayList(void);
 	CList <CTransMatrix, CTransMatrix &> &getTransformList(void)
 	{
@@ -123,7 +128,7 @@ public:
 	SolidSTL(CString &aSTLFileName);
 	~SolidSTL(void);
 	// call SolidCTL_Builder to complete all information
-	bool Build(bool bSolidSTL, CProgressCtrl *aProgressCtrl=NULL);
+	bool Build(bool bSolidSTL, CProgressCtrl *aProgressCtrl=NULL, CDemoInfo *aDemoInfo=NULL);
 	bool Build(int TriNum, CTriangle *pArray_Tri, CProgressCtrl *aProgressCtrl=NULL);
 	bool saveSTL(CString &aFileName);
 	CString &getFileName(void)	{ return m_STLFileName;	}
@@ -132,12 +137,14 @@ public:
 	int VertexNum()		{	return mVert_Num;	}
 	int HalfEdgeNum()	{	return mHE_Num;		}
 	int HandleNum()		{	return mHandle_Num;	}
+	bool ColorBuilt()   { return m_ColorBuilt;    }
 	CTriVertex& Vert(int avNum);
 	CTriangleID& Tri(int atNum);
 	CHalfEdge& Hedge(int aeNum);
 
 	int GetModelID()	{	return m_modelID;	};
 	void SetModelID(int modelID)	{ m_modelID = modelID;	}
+	void SetColorBuilt(bool b)		{ m_ColorBuilt = b;		}
 
 	// Manipulation functions
 	CTriangle getTri( int TriID);
